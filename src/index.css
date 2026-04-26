@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=League+Spartan:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "League Spartan", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", serif;
+
+  --color-brand-bg: #070D0D; /* --noir */
+  --color-brand-bg-secondary: #1A1A1A;
+  --color-brand-accent: #DA7756;
+  --color-brand-accent-hover: #C4623D;
+  --color-brand-text: #FFF7EC; /* --cream */
+  --color-brand-text-secondary: #C4908E; /* --rose-gold */
+  --color-brand-tag: #420D19; /* --berry-dark */
+  
+  /* Additional colors from instructions */
+  --color-noir: #070D0D;
+  --color-espresso: #3E2723;
+  --color-berry: #741E31;
+  --color-cream: #FFF7EC;
+  --color-rose-gold: #C4908E;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-text font-sans antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .noise-overlay {
+    position: relative;
+  }
+
+  .noise-overlay::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.04;
+    z-index: 10;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .bg-dots {
+    background-image: radial-gradient(var(--color-brand-text) 1px, transparent 0);
+    background-size: 40px 40px;
+  }
+
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  /* Laptop Mockup */
+  .laptop {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    perspective: 1000px;
+  }
+
+  .laptop__bezel {
+    @apply bg-linear-to-b from-[#333] to-[#1a1a1a] rounded-t-[14px] p-[10px] pb-0 relative;
+    box-shadow: 
+      #555 0px -2px 0px,
+      rgba(0,0,0,0.6) 0px 20px 60px,
+      rgba(212,132,90,0.08) 0px 0px 40px;
+  }
+
+  .laptop__camera {
+    @apply w-1.5 h-1.5 bg-[#222] border border-[#444] rounded-full mx-auto mb-1.5;
+  }
+
+  .laptop__screen {
+    @apply bg-[#1e1e1e] rounded-t-[4px] overflow-hidden;
+  }
+
+  .laptop__topbar {
+    @apply flex items-center gap-1.5 px-3 py-1.5 bg-[#2a2a2a] border-b border-[#333];
+  }
+
+  .laptop__dot { @apply w-2 h-2 rounded-full; }
+  .laptop__dot--red { @apply bg-[#ff5f57]; }
+  .laptop__dot--yellow { @apply bg-[#febb2e]; }
+  .laptop__dot--green { @apply bg-[#28c840]; }
+
+  .laptop__url {
+    @apply flex-1 text-center text-[10px] text-[#666] bg-[#222] py-0.5 px-3 rounded-sm mx-5;
+  }
+
+  .laptop__content {
+    @apply bg-[#1e1e1e] p-5 min-h-[260px] flex flex-col gap-4;
+  }
+
+  .claude-ui__header {
+    @apply flex items-center gap-2.5 pb-3 border-b border-[#333];
+  }
+
+  .claude-ui__logo {
+    @apply w-7 h-7 shrink-0 rounded-[6px] bg-white p-1;
+  }
+
+  .claude-ui__title { @apply text-sm font-semibold text-[#e8e8e8]; }
+  .claude-ui__subtitle { @apply text-[10px] text-[#777]; }
+
+  .claude-ui__msg {
+    @apply p-3 px-4 rounded-xl text-[12px] leading-relaxed max-w-[85%];
+  }
+
+  .claude-ui__msg--user {
+    @apply bg-[#741E31] text-[#FFF7EC] self-end rounded-br-[4px];
+  }
+
+  .claude-ui__msg--claude {
+    @apply bg-[#2a2a2a] text-[#d4d4d4] self-start rounded-bl-[4px] border border-[#333];
+  }
+
+  .claude-ui__carousel {
+    @apply opacity-0 animate-[fadeInCarousel_0.6s_ease_1.5s_1_forwards] flex gap-2 overflow-hidden rounded-lg py-1;
+  }
+
+  .claude-ui__carousel-track {
+    @apply flex gap-2 animate-[scrollSlides_12s_linear_2.1s_infinite];
+  }
+
+  .claude-ui__carousel img {
+    @apply w-[120px] h-[150px] object-cover rounded-md border border-[#444] shrink-0;
+  }
+
+  .laptop__bottom {
+    @apply bg-linear-to-b from-[#2a2a2a] to-[#1a1a1a] h-1;
+  }
+
+  .laptop__base {
+    @apply bg-linear-to-b from-[#444] via-[#333] to-[#2a2a2a] h-4 rounded-b-[8px] mx-[-14px] relative;
+    box-shadow: rgba(0,0,0,0.4) 0px 2px 8px;
+  }
+
+  .laptop__base::before {
+    @apply absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[3px] bg-[#555] rounded-b-[6px];
+    content: '';
+  }
+
+  .laptop__shadow {
+    @apply h-3 bg-[radial-gradient(rgba(0,0,0,0.35),transparent_70%)] mx-2.5 mt-0.5;
+  }
+
+  /* Float-stars */
+  .claude-floaters {
+    @apply absolute inset-0 overflow-hidden pointer-events-none z-10;
+  }
+
+  .claude-symbol {
+    @apply absolute opacity-60;
+    animation: 
+      floatBob var(--dur, 10s) ease-in-out infinite var(--delay, 0s),
+      spinSlow var(--spin, 30s) linear infinite var(--delay, 0s);
+  }
+
+  @keyframes floatBob {
+    0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+    50% { transform: translate(10px, -20px); opacity: 0.8; }
+  }
+
+  @keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes fadeInCarousel {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollSlides {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .stars {
+    @apply fixed inset-0 z-0 pointer-events-none;
+    background-image: 
+      radial-gradient(1px 1px at 10% 20%, rgba(228,238,240,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 70%, rgba(228,238,240,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 10%, rgba(228,238,240,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 25% 40%, rgba(228,238,240,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 85%, rgba(228,238,240,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 50%, rgba(228,238,240,0.5) 0%, transparent 100%),
+      radial-gradient(2px 2px at 15% 90%, rgba(228,238,240,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 30%, rgba(228,238,240,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 50% 15%, rgba(228,238,240,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(228,238,240,0.4) 0%, transparent 100%);
+    animation: starsFloat 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes starsFloat {
+    0% { transform: translateY(0) scale(1); opacity: 0.5; }
+    100% { transform: translateY(-20px) scale(1.05); opacity: 1; }
+  }
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary {
+  list-style: none;
+}
