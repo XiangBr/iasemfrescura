@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Check,
+  X,
   ChevronDown,
   ArrowRight,
-  Zap,
-  ShieldCheck,
 } from 'lucide-react';
+import { StarsBackground } from './StarsBackground';
 
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -43,6 +43,29 @@ export default function App() {
     return () => clearTimeout(tid);
   }, []);
 
+  const testimonialRows = [
+    [
+      { name: "Ana Paula S.", initials: "AP", color: "#7C3AED", time: "10:23", rotation: -4,
+        msgs: ["Gente, o workshop foi INCRÍVEL 😍", "Em 1 dia aprendi mais do que em meses tentando sozinha", "Já criei minha landing page do zero!"] },
+      { name: "Carlos M.", initials: "CM", color: "#0891B2", time: "14:45", rotation: 3,
+        msgs: ["Valeu cada centavo 🙌", "O funil que montei já converteu 3x o valor investido"] },
+      { name: "Fernanda T.", initials: "FT", color: "#059669", time: "09:12", rotation: -2,
+        msgs: ["Nunca pensei que ia conseguir criar uma LP completa em um dia", "Michel e Lucas são ÓTIMOS professores 👏", "Muito prático e direto ao ponto"] },
+      { name: "Rafael O.", initials: "RO", color: "#DC2626", time: "16:30", rotation: 5,
+        msgs: ["Melhor investimento do ano sem dúvida 🔥", "Já apliquei pra 3 clientes e eles amaram"] },
+    ],
+    [
+      { name: "Juliana K.", initials: "JK", color: "#EA580C", time: "11:55", rotation: -3,
+        msgs: ["Recomendei pra toda minha equipe!", "O conteúdo é muito denso mas bem explicado", "Replay é essencial, já assisti 2x 🎯"] },
+      { name: "Marcos A.", initials: "MA", color: "#0D9488", time: "13:20", rotation: 2,
+        msgs: ["A automação de conteúdo mudou meu negócio", "Consigo criar posts, carrosséis e roteiros em minutos 🚀"] },
+      { name: "Bianca L.", initials: "BL", color: "#BE185D", time: "18:05", rotation: -5,
+        msgs: ["Que workshop incrível!! Muito prático mesmo 🙏", "Saí com tudo pronto no mesmo dia ✅"] },
+      { name: "Diego R.", initials: "DR", color: "#1D4ED8", time: "08:44", rotation: 4,
+        msgs: ["Achei que ia ser mais teoria, mas não!", "100% mão na massa desde o começo 💪", "Super recomendo para qualquer área!"] },
+    ],
+  ];
+
   const revealVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -54,9 +77,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#070D0D] relative selection:bg-brand-tag text-brand-text">
-      {/* Background Particles */}
-      <div className="stars"></div>
-
       {/* Artistic Flair Dots Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-screen bg-dots z-0"></div>
 
@@ -86,7 +106,7 @@ export default function App() {
           <div className="flex items-center gap-3">
              <img src="/claude_logo.png" alt="Claude" className="w-8 h-8 rounded-lg brightness-110" />
              <a href="#" className="font-serif text-2xl text-brand-accent italic font-semibold">
-              IA Sem Frescura
+              Claude Sem Frescura
             </a>
           </div>
 
@@ -109,6 +129,7 @@ export default function App() {
       <main>
         {/* Hero Section */}
         <section id="hero" className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden noise-overlay min-h-screen flex items-center bg-linear-to-br from-[#070D0D] via-[#3E2723]/20 to-[#420D19]/30">
+          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none" starColor="#FFF7EC" starCount={600} />
           <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <motion.div
               initial="hidden"
@@ -117,12 +138,17 @@ export default function App() {
               variants={revealVariants}
               className="z-20"
             >
-              <span className="inline-block bg-brand-tag text-brand-accent text-[10px] font-bold tracking-[0.2em] px-4 py-1.5 rounded-full mb-8 uppercase border border-brand-accent/20">
-                Workshop 100% Prático • Claude
-              </span>
+              <div className="flex flex-col items-center md:items-start gap-4 mb-8">
+                <div className="bg-[#FFF7EC] px-5 py-2.5 rounded-full inline-flex items-center shadow-md shadow-black/20">
+                  <img src="/claude_logo_complete.png" alt="Claude" className="h-7 md:h-8" />
+                </div>
+                <span className="inline-block bg-brand-tag text-brand-accent text-[10px] font-bold tracking-[0.2em] px-4 py-1.5 rounded-full uppercase border border-brand-accent/20">
+                  Workshop 100% Prático
+                </span>
+              </div>
               <h1 className="font-serif text-5xl sm:text-6xl lg:text-8xl text-brand-text leading-[0.9] mb-8 tracking-tighter text-center md:text-left">
               Domine o Claude<br />
-                <span className="relative inline-block overflow-hidden h-[1.1em] align-top min-w-[200px] sm:min-w-[500px]">
+                <span className="relative inline-block overflow-hidden h-[1.1em] align-top w-full sm:w-auto sm:min-w-[500px]">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={activeWordIndex}
@@ -166,8 +192,8 @@ export default function App() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 50, rotateX: 10 }}
-              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1], delay: 0.3 }}
               className="relative z-20"
@@ -290,7 +316,7 @@ export default function App() {
         </section>
 
         {/* "Para Quem É" Section */}
-        <section id="para-quem" className="py-24 bg-[#070D0D]">
+        <section id="para-quem" className="py-24 bg-[#FFF7EC]">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
               initial="hidden"
@@ -302,7 +328,7 @@ export default function App() {
               <span className="inline-block px-3 py-1 bg-brand-tag text-brand-accent text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
                 PARA QUEM É
               </span>
-              <h2 className="text-4xl md:text-5xl font-serif text-white mb-4">Você está no lugar certo se...</h2>
+              <h2 className="text-4xl md:text-5xl font-serif text-[#070D0D] mb-4">Você está no lugar certo se...</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -320,12 +346,12 @@ export default function App() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-white/5 p-8 rounded-2xl hover:bg-white/10 hover:translate-y-[-4px] transition-all flex items-start gap-4 border border-white/5"
+                  className="bg-[#070D0D]/5 p-8 rounded-2xl hover:bg-[#070D0D]/10 hover:translate-y-[-4px] transition-all flex items-start gap-4 border border-[#070D0D]/10"
                 >
                   <div className="bg-brand-tag p-1.5 rounded-full text-brand-accent mt-1">
                     <Check size={18} strokeWidth={3} />
                   </div>
-                  <p className="text-lg font-medium text-white leading-tight">{item}</p>
+                  <p className="text-lg font-medium text-[#070D0D] leading-tight">{item}</p>
                 </motion.div>
               ))}
             </div>
@@ -333,8 +359,9 @@ export default function App() {
         </section>
 
         {/* "O Que Você Vai Construir" Section */}
-        <section id="workshop" className="py-24 bg-[#0A0F0F]">
-          <div className="max-w-7xl mx-auto px-6">
+        <section id="workshop" className="py-24 bg-[#0A0F0F] relative overflow-hidden">
+          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-60" starColor="#FFF7EC" starCount={110} />
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -377,13 +404,16 @@ export default function App() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="group bg-white/5 p-10 rounded-3xl relative overflow-hidden transition-all hover:bg-brand-tag/20 border border-white/5"
+                  className="group glass3d p-10 rounded-3xl relative overflow-hidden transition-all border border-white/10"
                 >
-                  <span className="font-serif text-7xl text-brand-accent/10 absolute top-4 right-8 font-black group-hover:text-brand-accent/20 transition-colors">
-                    {item.id}
-                  </span>
-                  <h3 className="text-2xl font-serif font-bold text-white mb-4 relative z-10">{item.title}</h3>
-                  <p className="text-white/60 text-lg leading-relaxed relative z-10">{item.desc}</p>
+                  {/* single direct child so .glass3d > * z-index rule applies here */}
+                  <div className="relative">
+                    <span className="font-serif text-7xl text-brand-accent/20 absolute top-0 right-0 font-black group-hover:text-brand-accent/35 transition-colors pointer-events-none select-none">
+                      {item.id}
+                    </span>
+                    <h3 className="text-2xl font-serif font-bold text-white mb-4">{item.title}</h3>
+                    <p className="text-white/70 text-lg leading-relaxed">{item.desc}</p>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -391,7 +421,7 @@ export default function App() {
         </section>
 
         {/* Programação */}
-        <section id="programacao" className="py-24 bg-[#070D0D] relative overflow-hidden">
+        <section id="programacao" className="py-24 bg-[#FFF7EC] relative overflow-hidden">
           <div className="max-w-3xl mx-auto px-6 relative z-10">
             <motion.div
               initial="hidden"
@@ -403,7 +433,7 @@ export default function App() {
               <span className="inline-block px-3 py-1 bg-brand-tag text-brand-accent text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
                 PROGRAMAÇÃO
               </span>
-              <h2 className="text-4xl md:text-5xl font-serif text-white mb-4 italic">Um dia completo, sem enrolação</h2>
+              <h2 className="text-4xl md:text-5xl font-serif text-[#070D0D] mb-4 italic">Um dia completo, sem enrolação</h2>
             </motion.div>
 
             <div className="space-y-12">
@@ -423,13 +453,13 @@ export default function App() {
                   transition={{ delay: i * 0.1 }}
                   className="flex gap-6 md:gap-10 border-l-2 border-brand-accent/20 pl-8 relative"
                 >
-                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-brand-accent border-4 border-[#070D0D] shadow-sm shadow-brand-accent/20"></div>
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-brand-accent border-4 border-[#FFF7EC] shadow-sm shadow-brand-accent/20"></div>
                   <div className="flex-shrink-0 pt-0.5">
                     <span className="text-brand-accent font-bold font-serif text-xl">{item.time}</span>
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-white mb-2 leading-tight">{item.title}</h4>
-                    <p className="text-white/50">{item.desc}</p>
+                    <h4 className="text-xl font-bold text-[#070D0D] mb-2 leading-tight">{item.title}</h4>
+                    <p className="text-[#070D0D]/55">{item.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -439,6 +469,7 @@ export default function App() {
 
         {/* Mentors Section */}
         <section id="mentores" className="py-24 md:py-32 bg-[#0A0F0F] relative overflow-hidden">
+          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-50" starColor="#FFF7EC" starCount={100} />
           <div className="max-w-7xl mx-auto px-6 relative z-10">
              <motion.div
                 initial="hidden"
@@ -522,8 +553,66 @@ export default function App() {
           </div>
         </section>
 
+        {/* Depoimentos */}
+        <section id="depoimentos" className="py-20 bg-[#070D0D] overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 mb-14">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={revealVariants}
+              className="text-center"
+            >
+              <span className="inline-block px-3 py-1 bg-brand-tag text-brand-accent text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
+                DEPOIMENTOS
+              </span>
+              <h2 className="text-4xl md:text-5xl font-serif text-white mb-3">O que estão falando</h2>
+              <p className="text-white/50 text-lg">Prints direto do WhatsApp — sem edição, sem roteiro.</p>
+            </motion.div>
+          </div>
+
+          <div className="space-y-5">
+            {testimonialRows.map((row, rowIndex) => (
+              <div key={rowIndex} className="overflow-hidden py-3">
+                <div className={`flex gap-5 px-2 ${rowIndex === 0 ? 'testimonials-track-left' : 'testimonials-track-right'}`}>
+                  {[...row, ...row].map((t, i) => (
+                    <div
+                      key={i}
+                      className="shrink-0 w-[230px] sm:w-[260px] rounded-2xl overflow-hidden shadow-2xl shadow-black/50"
+                      style={{ transform: `rotate(${t.rotation}deg)` }}
+                    >
+                      <div className="bg-[#075E54] px-3 py-2.5 flex items-center gap-2.5">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0"
+                          style={{ backgroundColor: t.color }}
+                        >
+                          {t.initials}
+                        </div>
+                        <div>
+                          <div className="text-white text-[13px] font-semibold leading-none">{t.name}</div>
+                          <div className="text-[#B2DFDB] text-[10px] mt-0.5">online</div>
+                        </div>
+                      </div>
+                      <div className="bg-[#E5DDD5] px-3 py-3 space-y-2">
+                        {t.msgs.map((msg, mi) => (
+                          <div key={mi} className="flex justify-start">
+                            <div className="bg-white rounded-xl rounded-tl-[4px] px-3 py-2 max-w-[90%] shadow-sm">
+                              <p className="text-[12px] text-gray-800 leading-snug">{msg}</p>
+                              <div className="text-[9px] text-gray-400 text-right mt-1">{t.time} ✓✓</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Pricing */}
-        <section id="preco" className="py-24 bg-[#1A1A1A] text-white">
+        <section id="preco" className="py-24 bg-[#FFF7EC]">
           <div className="max-w-7xl mx-auto px-6 text-center">
             <motion.div
               initial="hidden"
@@ -531,39 +620,106 @@ export default function App() {
               viewport={{ once: true }}
               variants={revealVariants}
             >
-              <h2 className="text-5xl md:text-6xl font-serif mb-16 italic">Garanta sua vaga</h2>
+              <h2 className="text-5xl md:text-6xl font-serif mb-16 italic text-[#070D0D]">Garanta sua vaga</h2>
 
-              <div className="max-w-md mx-auto bg-white text-brand-text p-6 sm:p-10 rounded-3xl relative shadow-2xl border border-brand-bg-secondary w-full">
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-accent text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
-                  Oferta Única
-                </span>
+              {/* Two-card layout */}
+              <div className="flex flex-col md:flex-row items-start gap-6 max-w-5xl mx-auto mb-10">
 
-                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-4">
-                  <span className="text-brand-text-secondary line-through text-lg sm:text-xl">R$ 397</span>
-                  <span className="text-4xl sm:text-5xl font-bold text-brand-accent">R$ 197</span>
+                {/* Card 1 — Workshop */}
+                <div className="flex-1 w-full bg-white text-[#070D0D] p-8 rounded-3xl relative shadow-xl shadow-[#070D0D]/10 border border-[#070D0D]/10">
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#070D0D] text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
+                    Workshop
+                  </span>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3 mb-2 mt-2">
+                    <span className="text-4xl font-bold text-brand-accent">R$ 49,90</span>
+                  </div>
+
+                  <hr className="mb-6 mt-6 border-[#070D0D]/10" />
+
+                  <ul className="text-left space-y-3 mb-8 text-sm">
+                    <li className="flex items-center gap-3 text-[#070D0D] font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> 8h de treinamento ao vivo
+                    </li>
+                    <li className="flex items-center gap-3 text-[#070D0D] font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> Gravação por 12 meses
+                    </li>
+                    <li className="flex items-center gap-3 text-[#070D0D] font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> Materiais e templates
+                    </li>
+                    <li className="flex items-center gap-3 text-[#070D0D]/30 line-through">
+                      <X size={16} className="text-[#070D0D]/30 shrink-0" strokeWidth={2.5} /> Mentoria personalizada
+                    </li>
+                    <li className="flex items-center gap-3 text-[#070D0D]/30 line-through">
+                      <X size={16} className="text-[#070D0D]/30 shrink-0" strokeWidth={2.5} /> Acompanhamento semanal
+                    </li>
+                    <li className="flex items-center gap-3 text-[#070D0D]/30 line-through">
+                      <X size={16} className="text-[#070D0D]/30 shrink-0" strokeWidth={2.5} /> Aplicação no seu negócio
+                    </li>
+                  </ul>
+
+                  <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-accent/20 flex items-center justify-center gap-2 active:scale-95">
+                    Quero o ingresso <ArrowRight size={18} />
+                  </button>
+                  <p className="mt-3 text-[11px] text-[#070D0D]/35 text-center">Pagamento seguro · Garantia de 7 dias</p>
                 </div>
 
-                <p className="text-brand-text-secondary font-medium mb-8 italic">ou 12x de R$ 18,41</p>
+                {/* Between-cards text */}
+                <div className="w-full md:w-36 shrink-0 md:self-center py-2 md:py-0">
+                  <p className="text-sm italic text-[#070D0D]/50 text-center leading-relaxed">
+                    "A diferença entre os planos não é o conteúdo — é a velocidade. No Workshop você aprende. Na Mentoria você implementa, com alguém do seu lado."
+                  </p>
+                </div>
 
-                <hr className="mb-8 border-brand-bg-secondary" />
+                {/* Card 2 — Workshop + Mentoria */}
+                <div className="flex-1 w-full bg-[#070D0D] text-white p-8 rounded-3xl relative shadow-2xl border border-brand-accent/25">
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-accent text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
+                    Mais Popular
+                  </span>
 
-                <ul className="text-left space-y-4 mb-10 text-brand-text-secondary font-medium text-sm sm:text-base">
-                  <li className="flex items-center gap-3"><Check size={18} className="text-brand-accent" strokeWidth={3} /> 8 horas de treinamento ao vivo</li>
-                  <li className="flex items-center gap-3"><Check size={18} className="text-brand-accent" strokeWidth={3} /> Gravação completa por 12 meses</li>
-                  <li className="flex items-center gap-3"><Check size={18} className="text-brand-accent" strokeWidth={3} /> Materiais e templates prontos</li>
-                  <li className="flex items-center gap-3"><Check size={18} className="text-brand-accent" strokeWidth={3} /> Acesso à comunidade exclusiva</li>
-                  <li className="flex items-center gap-3"><Check size={18} className="text-brand-accent" strokeWidth={3} /> Certificado de conclusão</li>
-                </ul>
+                  <p className="text-sm text-white/55 italic text-center mb-4 mt-2">
+                    Menos de R$ 38/semana com um especialista no seu negócio.
+                  </p>
 
-                <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-4 sm:py-5 rounded-2xl text-lg sm:text-xl font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-3 active:scale-95">
-                  Quero minha vaga agora <ArrowRight size={22} />
-                </button>
+                  <div className="flex items-center justify-center gap-3 mb-1">
+                    <span className="text-4xl font-bold text-brand-accent">R$ 197</span>
+                  </div>
+                  <p className="text-white/35 text-[12px] text-center mb-6">Workshop + 2 encontros de mentoria</p>
 
-                <div className="mt-6 flex items-center justify-center gap-4 text-xs font-medium text-brand-text-secondary opacity-60">
-                  <span className="flex items-center gap-1"><ShieldCheck size={14} /> Pagamento seguro</span>
-                  <span className="flex items-center gap-1"><Zap size={14} /> Garantia de 7 dias</span>
+                  <hr className="mb-6 border-white/10" />
+
+                  <ul className="text-left space-y-3 mb-8 text-sm">
+                    <li className="flex items-start gap-3 text-white font-bold">
+                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Tudo do Ingresso, mais:
+                    </li>
+                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> 2 encontros ao vivo de 1h com mentor
+                    </li>
+                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Aplicação direta no seu negócio
+                    </li>
+                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Revisão dos seus prompts e automações
+                    </li>
+                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Acesso direto via WhatsApp
+                    </li>
+                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Plano de implementação personalizado
+                    </li>
+                  </ul>
+
+                  <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
+                    Quero Workshop + Mentoria <ArrowRight size={20} />
+                  </button>
+                  <p className="mt-3 text-[11px] text-white/30 text-center">Pagamento seguro · Garantia de 7 dias · Vagas limitadas</p>
                 </div>
               </div>
+
+              {/* Below both cards */}
+              <p className="text-sm text-[#070D0D]/45 text-center max-w-md mx-auto leading-relaxed">
+                🔒 Garantia incondicional de 7 dias. Se não for o que esperava, devolvemos 100% — sem perguntas.
+              </p>
             </motion.div>
           </div>
         </section>
@@ -596,7 +752,7 @@ export default function App() {
         </section>
 
         {/* Final CTA */}
-        <section className="py-24">
+        <section className="py-24 bg-[#FFF7EC]">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
                initial={{ scale: 0.95, opacity: 0 }}
@@ -607,7 +763,7 @@ export default function App() {
               <div className="absolute inset-0 opacity-10 pointer-events-none noise-overlay"></div>
 
               <div className="relative z-10 px-4">
-                <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif mb-6 italic leading-tight">IA Sem Frescura.<br />Resultado de verdade.</h2>
+                <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif mb-6 italic leading-tight">Claude Sem Frescura.<br />Resultado de verdade.</h2>
                 <p className="text-white/80 text-lg sm:text-xl font-medium mb-12 max-w-xl mx-auto">
                   Uma vaga. Um dia. Uma mudança real no seu negócio.
                 </p>
@@ -623,7 +779,7 @@ export default function App() {
       <footer className="py-12 bg-[#070D0D] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold tracking-[0.2em] uppercase text-white/50">
           <div>
-            © 2025 IA Sem Frescura
+            © 2025 Claude Sem Frescura
           </div>
           <div className="flex gap-8 lowercase opacity-50 font-medium font-sans">
             <span>contato@iasemfrescura.com.br</span>
