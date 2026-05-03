@@ -762,10 +762,9 @@ export default function App() {
               <div className="w-64 absolute -top-6 left-1/2 -translate-x-1/2 bg-brand-accent text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-xl">
                 O Resultado Final
               </div>
-              <h3 className="text-3xl md:text-5xl font-semibold text-white mb-4 tracking-tight">Da teoria à infraestrutura digital.</h3>
+              <h3 className="text-3xl md:text-5xl font-semibold text-white mb-4 tracking-tight">Você não vai só assistir. Vai sair diferente de como entrou.</h3>
               <p className="text-brand-text/60 max-w-2xl mx-auto text-lg leading-relaxed">
-                Ao final desta jornada, você não apenas terá assistido a uma aula. Você terá construído, automatizado e economizado. Seu negócio terá uma nova camada de inteligência funcional.
-              </p>
+                Ao final desta jornada, você não apenas terá assistido a uma aula. Você terá construído, automatizado e economizado. Seu negócio terá uma nova camada de inteligência funcional.</p>
             </motion.div>
           </div>
         </section>
