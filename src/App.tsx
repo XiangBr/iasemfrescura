@@ -947,9 +947,9 @@ export default function App() {
                   </ul>
 
                   <div className="mt-auto pt-8">
-                    <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-accent/20 flex items-center justify-center gap-2 active:scale-95">
+                    <a href="https://pay.kiwify.com.br/9cysDDi" target="_blank" rel="noopener noreferrer" className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-accent/20 flex items-center justify-center gap-2 active:scale-95">
                       Quero o ingresso <ArrowRight size={18} />
-                    </button>
+                    </a>
                     <p className="mt-3 text-[11px] text-[#070D0D]/35 text-center">Pagamento seguro · Garantia de 7 dias</p>
                   </div>
                 </div>
@@ -1000,9 +1000,9 @@ export default function App() {
                   </ul>
 
                   <div className="mt-auto pt-8">
-                    <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
+                    <a href="https://pay.kiwify.com.br/TBkmE2R" target="_blank" rel="noopener noreferrer" className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
                       Quero Workshop + Mentoria <ArrowRight size={20} />
-                    </button>
+                    </a>
                     <p className="mt-3 text-[11px] text-[#042F34]/50 text-center">Pagamento seguro · Garantia de 7 dias · Vagas limitadas</p>
                   </div>
                 </div>
