@@ -1,18 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=League+Spartan:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "League Spartan", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", serif;
+  --font-serif: "League Spartan", ui-sans-serif, system-ui, sans-serif;
 
   --color-brand-bg: #070D0D; /* --noir */
   --color-brand-bg-secondary: #1A1A1A;
-  --color-brand-accent: #DA7756;
-  --color-brand-accent-hover: #C4623D;
+  --color-brand-accent: #042F34;
+  --color-brand-accent-hover: #042F34;
   --color-brand-text: #FFF7EC; /* --cream */
   --color-brand-text-secondary: #C4908E; /* --rose-gold */
-  --color-brand-tag: #420D19; /* --berry-dark */
-  
+  --color-brand-tag: #B5F2DB; /* --berry-dark */
+  --color-brand-teal: #042F34;
+
   /* Additional colors from instructions */
   --color-noir: #070D0D;
   --color-espresso: #3E2723;
@@ -221,8 +222,8 @@
   }
 
   .glass3d {
-    --filter-glass3d: blur(8px) brightness(1.9) saturate(2.5);
-    --color-glass3d: hsl(11 97% 2% / 0.7);
+    --filter-glass3d: blur(8px) brightness(1.4) saturate(1.8);
+    --color-glass3d: rgb(4 47 52 / 0.88);
     --noise-glass3d: url("https://www.transparenttextures.com/patterns/egg-shell.png");
 
     position: relative;

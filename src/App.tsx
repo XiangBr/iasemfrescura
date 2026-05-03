@@ -1,18 +1,149 @@
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import {
   Check,
   X,
   ChevronDown,
   ArrowRight,
+  Zap,
+  Sparkles,
+  MessageSquare,
+  Terminal,
+  Globe,
+  Users,
+  Layout,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 import { StarsBackground } from './StarsBackground';
+
+const JourneyMilestone = ({ icon: Icon, title, time, schedule, description, details, side = 'left', active, onClick, caseExtra }: any) => {
+  return (
+    <div className={`relative flex flex-col md:flex-row items-center justify-between w-full mb-12 md:mb-40 ${side === 'right' ? 'md:flex-row-reverse' : ''}`}>
+      {/* Content */}
+      <motion.div
+        initial={{ opacity: 0, y: 20, x: side === 'left' ? -20 : 20 }}
+        whileInView={{ opacity: 1, y: 0, x: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        className={`w-full md:w-[46%] ${side === 'right' ? 'md:text-left' : 'md:text-right'} group z-20 order-2 md:order-none px-4 md:px-0`}
+      >
+        <div
+          onClick={onClick}
+          className={`cursor-pointer p-6 md:p-8 rounded-[32px] transition-all duration-500 border relative ${
+            active
+              ? 'bg-white border-brand-accent shadow-2xl shadow-brand-accent/15 scale-[1.02]'
+              : 'bg-white/60 backdrop-blur-sm border-[#070D0D]/10 hover:border-brand-accent/40 shadow-sm'
+          }`}
+        >
+          <div className={`flex items-center gap-3 mb-2 ${side === 'right' ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row`}>
+            <span className="text-brand-accent font-semibold text-lg md:text-xl tracking-tight">{time}</span>
+            <div className={`p-2.5 rounded-xl transition-transform duration-500 ${active ? 'bg-brand-accent text-white scale-110 shadow-lg' : 'bg-brand-tag text-brand-accent'}`}>
+              <Icon size={24} />
+            </div>
+          </div>
+          {schedule && (
+            <div className="inline-flex items-center gap-1.5 bg-brand-tag/50 border border-brand-accent/20 px-3 py-1 rounded-full mb-3">
+              <Clock size={11} className="text-brand-accent" />
+              <span className="text-[11px] text-brand-accent font-semibold tracking-tight">{schedule}</span>
+            </div>
+          )}
+          <h4 className="text-2xl md:text-3xl font-semibold text-[#070D0D] mb-2 leading-tight tracking-tight">{title}</h4>
+          <p className="text-[#070D0D]/60 text-sm md:text-base leading-relaxed">{description}</p>
+
+          <AnimatePresence>
+            {active && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-6 mt-6 border-t border-[#070D0D]/10 space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    {details.map((d: any, i: number) => (
+                      <div key={i} className="flex flex-col gap-1 p-3 rounded-xl bg-[#070D0D]/5 border border-[#070D0D]/5 text-left">
+                         <div className="flex items-center gap-2 text-brand-accent">
+                            <d.icon size={14} />
+                            <span className="text-[13px] font-black uppercase tracking-wider">{d.label}</span>
+                         </div>
+                         <p className="text-[15px] text-[#070D0D]/50 leading-tight">{d.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {caseExtra && (
+                    <div className="bg-brand-accent/5 p-4 rounded-2xl border border-brand-accent/15">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Zap size={12} className="text-brand-accent animate-pulse" />
+                        <span className="text-[15px] font-black text-brand-accent uppercase tracking-[0.2em] block">Case ao vivo</span>
+                      </div>
+                      <p className="text-[14px] font-medium text-[#070D0D]/80 italic leading-relaxed">"{caseExtra}"</p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {!active && (
+             <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-20 md:hidden">
+                <ChevronDown size={20} className="text-[#070D0D]" />
+             </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Point on Path */}
+      <div className="md:absolute left-1/2 md:-translate-x-1/2 flex items-center justify-center my-4 md:my-0 order-1 md:order-none z-30">
+        <motion.div
+          initial={{ scale: 0 }}
+          whileInView={{ scale: 1 }}
+          className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 border-[#FFF7EC] relative z-10 transition-colors duration-500 flex items-center justify-center shadow-lg ${active ? 'bg-brand-accent text-white' : 'bg-[#070D0D]/10 text-[#070D0D]/20'}`}
+        >
+           {active ? <Zap size={16} fill="currentColor" /> : <div className="w-1.5 h-1.5 rounded-full bg-current" />}
+        </motion.div>
+        {active && (
+          <motion.div
+            layoutId="active-glow"
+            className="absolute w-16 h-16 md:w-24 md:h-24 bg-brand-accent/15 rounded-full blur-2xl"
+          />
+        )}
+      </div>
+
+      {/* Empty space for the other side on desktop */}
+      <div className="hidden md:block w-[46%]" />
+    </div>
+  );
+};
+
+const PathNode = ({ icon: Icon, title, side = 'left', top, visible = true }: any) => (
+  <AnimatePresence>
+    {visible && (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        style={{ top: `${top}%` }}
+        className={`absolute flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#070D0D]/40 ${side === 'left' ? 'flex-row-reverse right-[53%]' : 'left-[57%]'} whitespace-nowrap hidden md:flex pointer-events-none z-10`}
+      >
+        <div className="p-2 bg-[#070D0D]/10 rounded-lg border border-[#070D0D]/10 transition-colors">
+          <Icon size={16} className="text-brand-accent" />
+        </div>
+        <span>{title}</span>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   const [chatPhase, setChatPhase] = useState(0);
-  const words = [  "Na Prática","Sem frescura", "De Verdade", "Com Resultado"];
+  const [activeMilestone, setActiveMilestone] = useState<number | null>(null);
+  const words = [  "além do Chat", "de verdade", "por completo"];
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
+  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,7 +153,7 @@ export default function App() {
 
     const interval = setInterval(() => {
       setActiveWordIndex((prev) => (prev + 1) % words.length);
-    }, 3000);
+    }, 2000);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -43,26 +174,16 @@ export default function App() {
     return () => clearTimeout(tid);
   }, []);
 
-  const testimonialRows = [
+  const depoimentoRows = [
     [
-      { name: "Ana Paula S.", initials: "AP", color: "#7C3AED", time: "10:23", rotation: -4,
-        msgs: ["Gente, o workshop foi INCRÍVEL 😍", "Em 1 dia aprendi mais do que em meses tentando sozinha", "Já criei minha landing page do zero!"] },
-      { name: "Carlos M.", initials: "CM", color: "#0891B2", time: "14:45", rotation: 3,
-        msgs: ["Valeu cada centavo 🙌", "O funil que montei já converteu 3x o valor investido"] },
-      { name: "Fernanda T.", initials: "FT", color: "#059669", time: "09:12", rotation: -2,
-        msgs: ["Nunca pensei que ia conseguir criar uma LP completa em um dia", "Michel e Lucas são ÓTIMOS professores 👏", "Muito prático e direto ao ponto"] },
-      { name: "Rafael O.", initials: "RO", color: "#DC2626", time: "16:30", rotation: 5,
-        msgs: ["Melhor investimento do ano sem dúvida 🔥", "Já apliquei pra 3 clientes e eles amaram"] },
+      { src: '/depoimentos/depoimento_1.png', rotation: -3 },
+      { src: '/depoimentos/depoimento_2.png', rotation: 2 },
+      { src: '/depoimentos/depoimento_3.png', rotation: -1 },
     ],
     [
-      { name: "Juliana K.", initials: "JK", color: "#EA580C", time: "11:55", rotation: -3,
-        msgs: ["Recomendei pra toda minha equipe!", "O conteúdo é muito denso mas bem explicado", "Replay é essencial, já assisti 2x 🎯"] },
-      { name: "Marcos A.", initials: "MA", color: "#0D9488", time: "13:20", rotation: 2,
-        msgs: ["A automação de conteúdo mudou meu negócio", "Consigo criar posts, carrosséis e roteiros em minutos 🚀"] },
-      { name: "Bianca L.", initials: "BL", color: "#BE185D", time: "18:05", rotation: -5,
-        msgs: ["Que workshop incrível!! Muito prático mesmo 🙏", "Saí com tudo pronto no mesmo dia ✅"] },
-      { name: "Diego R.", initials: "DR", color: "#1D4ED8", time: "08:44", rotation: 4,
-        msgs: ["Achei que ia ser mais teoria, mas não!", "100% mão na massa desde o começo 💪", "Super recomendo para qualquer área!"] },
+      { src: '/depoimentos/depoimento_4.png', rotation: 3 },
+      { src: '/depoimentos/depoimento_5.png', rotation: -2 },
+      { src: '/depoimentos/depoimento_1.png', rotation: 1 },
     ],
   ];
 
@@ -82,13 +203,13 @@ export default function App() {
 
       {/* Claude Floaters */}
       <div className="claude-floaters">
-        <div className="claude-symbol" style={{ top: '10%', right: '10%', '--dur': '8s', '--delay': '0s', '--spin': '20s' } as any}>
+        <div className="claude-symbol" style={{ top: '8%', right: '5%', '--dur': '8s', '--delay': '0s', '--spin': '20s' } as any}>
           <img src="/claude_logo.png" alt="star" className="w-8 h-8 md:w-12 md:h-12" />
         </div>
         <div className="claude-symbol" style={{ top: '60%', right: '5%', '--dur': '12s', '--delay': '2s', '--spin': '35s' } as any}>
           <img src="/claude_logo.png" alt="star" className="w-10 h-10 md:w-16 md:h-16" />
         </div>
-        <div className="claude-symbol" style={{ bottom: '15%', right: '30%', '--dur': '10s', '--delay': '4s', '--spin': '45s' } as any}>
+        <div className="claude-symbol" style={{ bottom: '10%', right: '20%', '--dur': '10s', '--delay': '4s', '--spin': '45s' } as any}>
           <img src="/claude_logo.png" alt="star" className="w-6 h-6 md:w-10 md:h-10" />
         </div>
         <div className="claude-symbol" style={{ top: '25%', left: '5%', '--dur': '9s', '--delay': '1s', '--spin': '30s' } as any}>
@@ -105,7 +226,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
              <img src="/claude_logo.png" alt="Claude" className="w-8 h-8 rounded-lg brightness-110" />
-             <a href="#" className="font-serif text-2xl text-brand-accent italic font-semibold">
+             <a href="#" className="text-2xl text-[#DA7756] font-semibold tracking-tight">
               Claude Sem Frescura
             </a>
           </div>
@@ -128,9 +249,9 @@ export default function App() {
 
       <main>
         {/* Hero Section */}
-        <section id="hero" className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden noise-overlay min-h-screen flex items-center bg-linear-to-br from-[#070D0D] via-[#3E2723]/20 to-[#420D19]/30">
+        <section id="hero" className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden  min-h-screen flex items-center bg-linear-to-br from-[#070D0D] via-[#3E2723]/20 to-[#420D19]/30">
           <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none" starColor="#FFF7EC" starCount={600} />
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+          <div className="max-w-9xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -146,7 +267,7 @@ export default function App() {
                   Workshop 100% Prático
                 </span>
               </div>
-              <h1 className="font-serif text-5xl sm:text-6xl lg:text-8xl text-brand-text leading-[0.9] mb-8 tracking-tighter text-center md:text-left">
+              <h1 className="font-semibold text-5xl sm:text-6xl lg:text-8xl text-brand-text leading-[0.9] mb-2 tracking-tighter text-center md:text-left">
               Domine o Claude<br />
                 <span className="relative inline-block overflow-hidden h-[1.1em] align-top w-full sm:w-auto sm:min-w-[500px]">
                   <AnimatePresence mode="wait">
@@ -156,7 +277,7 @@ export default function App() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -60, opacity: 0 }}
                       transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-                      className="absolute italic text-brand-accent w-full text-center md:text-left left-0"
+                      className="absolute text-[#042F34] font-semibold w-full text-center md:text-left left-0 text-[#B5F2DB]"
                     >
                       {words[activeWordIndex]}
                     </motion.span>
@@ -164,8 +285,10 @@ export default function App() {
                 </span>
               </h1>
 
-              <p className="text-brand-text/70 text-lg sm:text-xl md:text-2xl mb-12 max-w-lg leading-relaxed font-light text-center md:text-left mx-auto md:mx-0">
-                Aprenda Claude do zero ao avançado em 1 dia — com aplicações reais para o seu negócio.
+              <p className="text-brand-text/70 text-xl font-bold sm:text-xl md:text-2xl mb-12 max-w-lg leading-relaxed  text-center md:text-left mx-auto md:mx-0">
+                Chat. Cowork. Code.<br></br><br></br>
+                Em 1 dia, você aprende as 3 camadas do Claude que 95% dos usuários nem sabem que existem.<br></br>
+                Sem frescura e com aplicações no seu trabalho.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mb-14 px-4 sm:px-0">
@@ -183,11 +306,43 @@ export default function App() {
                 </a>
               </div>
 
-              <div className="flex flex-wrap justify-center md:justify-start gap-y-4 gap-x-8 text-[10px] sm:text-[11px] font-bold text-brand-text opacity-40 tracking-[0.1em] uppercase">
+              <div className="flex flex-wrap justify-center md:justify-start gap-y-4 gap-x-8 text-[10px] sm:text-[11px] sm:text-lg font-bold text-brand-text opacity-40 tracking-[0.1em] uppercase">
                 <span className="flex items-center gap-2.5">📅 Online ao vivo</span>
                 <span className="flex items-center gap-2.5">⏰ 10h às 18h</span>
                 <span className="flex items-center gap-2.5">🎯 100% Prático</span>
                 <span className="flex items-center gap-2.5">✅ Replay disponível</span>
+              </div>
+
+              {/* Social proof */}
+              <div className="flex flex-col items-center md:items-start gap-2 mt-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2.5 shrink-0">
+                    {[
+                      { l: 'D', bg: '#E91E8C' },
+                      { l: 'I', bg: '#FF6B2B' },
+                      { l: 'N', bg: '#7C3AED' },
+                      { l: 'A', bg: '#0891B2' },
+                    ].map((a, i) => (
+                      <div
+                        key={i}
+                        className="w-8 h-8 rounded-full border-2 border-[#070D0D] flex items-center justify-center text-white text-[11px] font-bold"
+                        style={{ backgroundColor: a.bg }}
+                      >
+                        {a.l}
+                      </div>
+                    ))}
+                    <div className="w-8 h-8 rounded-full border-2 border-[#070D0D] bg-brand-accent flex items-center justify-center text-white text-[11px] font-bold">
+                      +
+                    </div>
+                  </div>
+                  <p className="text-sm text-brand-text/60 leading-snug">
+                    <span className="font-bold text-brand-text">+ de 1.000 pessoas</span> na comunidade IA Sem Frescura
+                  </p>
+                </div>
+                <p className="text-xs text-brand-text/35 flex items-center gap-1.5">
+                  <Check size={11} className="text-brand-accent shrink-0" />
+                  assim que a gravação estiver disponível, você recebe primeiro.
+                </p>
               </div>
             </motion.div>
 
@@ -213,7 +368,7 @@ export default function App() {
                       <div className="claude-ui__header">
                         <img className="claude-ui__logo" src="/claude_logo.png" alt="Claude logo" />
                         <div>
-                          <div className="claude-ui__title italic font-serif">Claude</div>
+                          <div className="claude-ui__title font-semibold">Claude</div>
                           <div className="claude-ui__subtitle uppercase tracking-widest font-bold opacity-60">Seu assistente de IA</div>
                         </div>
                       </div>
@@ -325,20 +480,20 @@ export default function App() {
               variants={revealVariants}
               className="text-center mb-16"
             >
-              <span className="inline-block px-3 py-1 bg-brand-tag text-brand-accent text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
+              <span className="inline-block px-3 py-1 bg-[#042F34] text-[#B5F2DB] text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
                 PARA QUEM É
               </span>
-              <h2 className="text-4xl md:text-5xl font-serif text-[#070D0D] mb-4">Você está no lugar certo se...</h2>
+              <h2 className="text-4xl md:text-5xl font-semibold text-[#070D0D] mb-4 tracking-tight">Você está no lugar certo se...</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                "Já usa IA mas ainda faz as mesmas tarefas manualmente",
+                "Usa o Claude (ou outra IA) só no modo chat e sabe que dá pra fazer mais",
                 "Quer criar landing pages e funis sem depender de dev",
-                "Usa ChatGPT básico e quer evoluir de verdade",
-                "Precisa automatizar copy, posts e roteiros com qualidade",
-                "Quer entender por que o Claude performa melhor que outros modelos",
-                "Busca aplicações práticas, não teoria de livro"
+                "Já tentou criar algo mais avançado mas travou nos limites da ferramenta",
+                "Quer que a IA execute tarefas por você, não só responda perguntas",
+                "Precisa processar documentos, planilhas ou arquivos sem fazer tudo na mão",
+                "Ouve falar de Cowork, Code e Skills mas não sabe por onde começar"
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -346,9 +501,9 @@ export default function App() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-[#070D0D]/5 p-8 rounded-2xl hover:bg-[#070D0D]/10 hover:translate-y-[-4px] transition-all flex items-start gap-4 border border-[#070D0D]/10"
+                  className="bg-[#E4EEF0]/5 p-8 rounded-2xl hover:bg-[#070D0D]/10 hover:translate-y-[-4px] transition-all flex items-start gap-4 border border-[#070D0D]/10"
                 >
-                  <div className="bg-brand-tag p-1.5 rounded-full text-brand-accent mt-1">
+                  <div className="bg-[#042F34]  p-1.5 rounded-full text-[#B5F2DB] mt-1">
                     <Check size={18} strokeWidth={3} />
                   </div>
                   <p className="text-lg font-medium text-[#070D0D] leading-tight">{item}</p>
@@ -372,30 +527,30 @@ export default function App() {
               <span className="inline-block px-3 py-1 bg-brand-tag text-brand-accent text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
                 NO DIA DO WORKSHOP
               </span>
-              <h2 className="text-4xl md:text-5xl font-serif text-white mb-4">Você sai com isso pronto:</h2>
+              <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight">Você sai com isso pronto:</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-8">
               {[
                 {
                   id: "01",
-                  title: "Landing Page Funcional",
-                  desc: "Do zero: copy, estrutura e deploy — tudo com Claude"
+                  title: "Claude Chat dominado",
+                  desc: "Projetos, artefatos, plugins, memória — tudo que o chat oferece e você ainda não usa."
                 },
                 {
                   id: "02",
-                  title: "Funil de Vendas Automatizado",
-                  desc: "Sequência de e-mails e checkout integrado, gerado via IA"
+                  title: "Cowork configurado",
+                  desc: "O Claude operando no seu computador: processando arquivos, automatizando tarefas, executando por você."
                 },
                 {
                   id: "03",
-                  title: "Máquina de Conteúdo",
-                  desc: "Templates de posts, carrosséis e roteiros em segundos"
+                  title: "Code funcionando",
+                  desc: "Sua primeira aplicação construída do terminal. Skills instaladas, estrutura rodando."
                 },
                 {
                   id: "04",
-                  title: "Automações Reais",
-                  desc: "Conecte Claude a processos do seu negócio sem código"
+                  title: "Tokens sob controle",
+                  desc: "As técnicas que fazem seu plano render a semana inteira, não acabar na terça."
                 }
               ].map((item, i) => (
                 <motion.div
@@ -408,10 +563,10 @@ export default function App() {
                 >
                   {/* single direct child so .glass3d > * z-index rule applies here */}
                   <div className="relative">
-                    <span className="font-serif text-7xl text-brand-accent/20 absolute top-0 right-0 font-black group-hover:text-brand-accent/35 transition-colors pointer-events-none select-none">
+                    <span className="text-5xl text-[#B5F2DB] absolute top-0 right-0 font-bold  transition-colors pointer-events-none select-none">
                       {item.id}
                     </span>
-                    <h3 className="text-2xl font-serif font-bold text-white mb-4">{item.title}</h3>
+                    <h3 className="text-2xl font-semibold text-white mb-4 tracking-tight">{item.title}</h3>
                     <p className="text-white/70 text-lg leading-relaxed">{item.desc}</p>
                   </div>
                 </motion.div>
@@ -420,50 +575,198 @@ export default function App() {
           </div>
         </section>
 
-        {/* Programação */}
-        <section id="programacao" className="py-24 bg-[#FFF7EC] relative overflow-hidden">
-          <div className="max-w-3xl mx-auto px-6 relative z-10">
+        {/* Programação — Journey Path */}
+        <section id="programacao" className="py-32 bg-[#FFF7EC] relative overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-brand-accent/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-dots opacity-[0.03] pointer-events-none" />
+
+          <div className="max-w-5xl mx-auto px-6 relative z-10" ref={containerRef}>
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={revealVariants}
-              className="text-center mb-20"
+              className="text-center mb-12"
             >
-              <span className="inline-block px-3 py-1 bg-brand-tag text-brand-accent text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
-                PROGRAMAÇÃO
+              <span className="inline-block px-4 py-1.5 bg-[#042F34] text-[#B5F2DB] text-[10px] font-bold tracking-[0.3em] rounded-full mb-6 border border-brand-accent/20 uppercase">
+                A JORNADA
               </span>
-              <h2 className="text-4xl md:text-5xl font-serif text-[#070D0D] mb-4 italic">Um dia completo, sem enrolação</h2>
+              <h2 className="text-5xl md:text-7xl font-semibold text-[#070D0D] mb-6 leading-tight tracking-tighter">Um caminho desenhado<br />para o seu domínio</h2>
+              <p className="text-[#070D0D]/50 max-w-xl mx-auto text-lg mb-8">
+                Não é apenas uma aula, é uma evolução guiada. Clique nos módulos para ver os detalhes.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="flex items-center gap-2 bg-[#042F34] border border-brand-accent/25 px-5 py-2.5 rounded-full shadow-sm">
+                  <Calendar size={15} className="text-[#B5F2DB]" />
+                  <span className="text-sm font-semibold text-[#B5F2DB] tracking-tight">30 de Maio, 2026</span>
+                </div>
+                <div className="flex items-center gap-2 bg-[#042F34] border border-brand-accent/25 px-5 py-2.5 rounded-full shadow-sm">
+                  <Clock size={15} className="text-[#B5F2DB]" />
+                  <span className="text-sm font-semibold text-[#B5F2DB] tracking-tight">10h às 18h · Online ao vivo</span>
+                </div>
+              </div>
             </motion.div>
 
-            <div className="space-y-12">
-              {[
-                { time: "10h00", title: "Abertura & Fundamentos", desc: "Interface do Claude: chat, projects, cowork e code" },
-                { time: "11h00", title: "Claude vs Outros Modelos", desc: "Comparativo prático: quando usar cada um" },
-                { time: "13h00", title: "Construindo Landing Pages", desc: "Do briefing ao ar em tempo real" },
-                { time: "14h30", title: "Funis, Checkouts e Copy", desc: "Automação completa de um funil de vendas" },
-                { time: "16h00", title: "Conteúdo em Escala", desc: "Posts, roteiros e materiais em minutos" },
-                { time: "17h30", title: "Automações Avançadas", desc: "Casos práticos + Q&A ao vivo" }
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex gap-6 md:gap-10 border-l-2 border-brand-accent/20 pl-8 relative"
-                >
-                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-brand-accent border-4 border-[#FFF7EC] shadow-sm shadow-brand-accent/20"></div>
-                  <div className="flex-shrink-0 pt-0.5">
-                    <span className="text-brand-accent font-bold font-serif text-xl">{item.time}</span>
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-[#070D0D] mb-2 leading-tight">{item.title}</h4>
-                    <p className="text-[#070D0D]/55">{item.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
+            {/* Milestones and Nodes */}
+            <div className="relative">
+              {/* Floating Icons along path */}
+              <div className="absolute inset-0 pointer-events-none z-10 hidden md:block">
+                {[
+                  { top: '8%', left: '50.5%', Icon: Zap, size: 16, delay: 0 },
+                  { top: '22%', left: '49.5%', Icon: Sparkles, size: 20, delay: 1.5 },
+                  { top: '35%', left: '50.2%', Icon: Zap, size: 14, delay: 0.5 },
+                  { top: '50%', left: '49.8%', Icon: MessageSquare, size: 18, delay: 2 },
+                  { top: '65%', left: '50.3%', Icon: Zap, size: 22, delay: 1 },
+                  { top: '80%', left: '49.7%', Icon: Terminal, size: 16, delay: 2.5 },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 0.2 }}
+                    animate={{
+                      y: [0, -20, 0],
+                      x: [0, 5, -5, 0]
+                    }}
+                    transition={{
+                      duration: 4 + Math.random() * 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: item.delay
+                    }}
+                    style={{ top: item.top, left: item.left }}
+                    className="absolute -translate-x-1/2"
+                  >
+                    <item.Icon size={item.size} className="text-brand-accent" />
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Desktop SVG Path */}
+              <svg
+                className="absolute left-1/2 -translate-x-1/2 top-0 w-full h-full pointer-events-none hidden md:block"
+                viewBox="0 0 100 1000"
+                fill="none"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M50,0 Q65,100 50,200 T50,400 T50,600 T50,800 T50,950"
+                  stroke="rgba(7,13,13,0.05)"
+                  strokeWidth="0.1"
+                />
+                <motion.path
+                  d="M50,0 Q65,100 50,200 T50,400 T50,600 T50,800 T50,950"
+                  stroke="var(--color-brand-accent)"
+                  strokeWidth="0.2"
+                  style={{ pathLength }}
+                />
+              </svg>
+
+              {/* Mobile Line */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-[#070D0D]/10 md:hidden" />
+
+              {/* Sub-milestones (Visible when no main module is expanded) */}
+              <PathNode top={2} side="right" icon={MessageSquare} title="Projetos Internos" visible={activeMilestone === null} />
+
+              <PathNode top={28} side="left" icon={Check} title="Agentes rodando no automático" visible={activeMilestone === null} />
+              {/* <PathNode top={30} side="right" icon={Zap} title="Sync Local" visible={activeMilestone === null} /> */}
+
+              {/* <PathNode top={53} side="left" icon={Terminal} title="Deep Knowledge" visible={activeMilestone === null} /> */}
+              <PathNode top={58} side="right" icon={Globe} title="Rodar no Terminal" visible={activeMilestone === null} />
+
+              <PathNode top={78} side="left" icon={Sparkles} title="Economia de Tokens" visible={activeMilestone === null} />
+              <PathNode top={83} side="right" icon={Zap} title="Savings" visible={activeMilestone === null} />
+
+              {/* Milestones */}
+              <div className="relative flex flex-col pt-10">
+                <JourneyMilestone
+                  time="Módulo 1 — Claude Chat"
+                  schedule="10h00 → 12h00"
+                  icon={MessageSquare}
+                  title="Você pergunta. Ele responde."
+                  description="Dominando a plataforma inteira: Projetos, artefatos e plugins. Pare de usar apenas 10% do potencial do Claude."
+                  details={[
+                    { label: "Projetos", desc: "Suba arquivos e instruções que o Claude consulta em toda conversa", icon: Layout },
+                    { label: "Artefatos", desc: "Gere dashboards, relatórios e ferramentas interativas direto no chat", icon: Zap },
+                    { label: "Plugins (MCP)", desc: "Puxe dados do Drive, leia emails do Gmail e organize o Calendar", icon: Globe },
+                    { label: "Memória", desc: "Configure uma vez e o Claude mantém seu contexto entre sessões", icon: MessageSquare }
+                  ]}
+                  caseExtra="Projeto configurado + plugin conectado + artefato funcional com seus dados."
+                  side="left"
+                  active={activeMilestone === 0}
+                  onClick={() => setActiveMilestone(activeMilestone === 0 ? null : 0)}
+                />
+
+                <JourneyMilestone
+                  time="Módulo 2 — Claude Cowork"
+                  schedule="13h00 → 15h00"
+                  icon={Users}
+                  title="Você pede. O Claude executa."
+                  description="O Claude sai do navegador e entra no seu computador. Acesso a arquivos locais e tarefas sem supervisão manual."
+                  details={[
+                   { label: "Setup", desc: "Configure o Cowork com acesso às pastas e ferramentas do seu trabalho", icon: Zap },
+                  { label: "Processamento", desc: "Cruze dados de múltiplas planilhas e gere relatórios consolidados automaticamente", icon: Layout },
+                  { label: "Análise em lote", desc: "Entregue 50 contratos e receba uma tabela comparativa com prazos, valores e riscos", icon: Check },
+                  { label: "Fluxos completos", desc: "Leia emails → extraia anexos → processe os dados → atualize sua planilha de controle", icon: ArrowRight }
+                  ]}
+                  caseExtra="Automação real que substitui um processo manual da sua rotina."
+                  side="right"
+                  active={activeMilestone === 1}
+                  onClick={() => setActiveMilestone(activeMilestone === 1 ? null : 1)}
+                />
+
+                <JourneyMilestone
+                  time="Módulo 3 — Claude Code"
+                  schedule="15h30 → 17h30"
+                  icon={Terminal}
+                  title="Você planeja. Ele constrói."
+                  description="Criação de aplicações, scripts e sistemas direto do terminal. Não precisa ser programador, precisa saber pedir."
+                  details={[
+                   { label: "Terminal", desc: "Instale, configure e rode seu primeiro projeto funcional do zero", icon: Terminal },
+                  { label: "Skills", desc: "Crie regras que padronizam entregas: tom de voz, formato, estrutura de código", icon: Zap },
+                  { label: "Aplicações", desc: "Construa dashboards, landing pages e ferramentas internas com um prompt", icon: Layout },
+                  { label: "Integrações", desc: "Conecte Supabase, Notion, Google Sheets e APIs pra sistemas que atualizam sozinhos", icon: Globe }
+                  ]}
+                  caseExtra="Ferramenta funcional construída do zero no terminal."
+                  side="left"
+                  active={activeMilestone === 2}
+                  onClick={() => setActiveMilestone(activeMilestone === 2 ? null : 2)}
+                />
+
+                <JourneyMilestone
+                  time="Bônus — Economia de Tokens"
+                  schedule="17h30 → 18h00"
+                  icon={Zap}
+                  title="O módulo que se paga sozinho"
+                  description="Como dominar o consumo de tokens e fazer sua assinatura render 5x mais com as estratégias certas."
+                  details={[
+                    { label: "Consumo", desc: "O que realmente gasta seus créditos", icon: Check },
+                    { label: "Compactação", desc: "Formatos e estruturas que economizam", icon: Layout },
+                    { label: "Sessão", desc: "Quando abrir nova conversa ou continuar", icon: MessageSquare },
+                    { label: "Camadas", desc: "Chat vs Cowork vs Code: quando usar", icon: Zap }
+                  ]}
+                  caseExtra="Estratégia de economia instalada e configurada na hora."
+                  side="right"
+                  active={activeMilestone === 3}
+                  onClick={() => setActiveMilestone(activeMilestone === 3 ? null : 3)}
+                />
+              </div>
             </div>
+
+            {/* Final Journey Note */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="mt-2 text-center p-12 glass3d rounded-[48px] border border-brand-accent/20 relative"
+            >
+              <div className="w-64 absolute -top-6 left-1/2 -translate-x-1/2 bg-brand-accent text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-xl">
+                O Resultado Final
+              </div>
+              <h3 className="text-3xl md:text-5xl font-semibold text-white mb-4 tracking-tight">Da teoria à infraestrutura digital.</h3>
+              <p className="text-brand-text/60 max-w-2xl mx-auto text-lg leading-relaxed">
+                Ao final desta jornada, você não apenas terá assistido a uma aula. Você terá construído, automatizado e economizado. Seu negócio terá uma nova camada de inteligência funcional.
+              </p>
+            </motion.div>
           </div>
         </section>
 
@@ -479,9 +782,9 @@ export default function App() {
                 className="text-center mb-16 md:20"
               >
                 <span className="inline-block px-4 py-1.5 bg-brand-tag text-brand-accent text-[10px] font-bold tracking-[0.2em] rounded-full mb-6 border border-brand-accent/20 uppercase">
-                  INSTRUTORES
+                  QUEM VAI TE ENSINAR
                 </span>
-                <h2 className="text-4xl md:text-6xl font-serif text-white mb-6">Seus mentores nessa imersão</h2>
+                <h2 className="text-4xl md:text-6xl font-semibold text-white mb-6 tracking-tight">Seus mentores nessa imersão</h2>
                 <p className="text-white/50 max-w-2xl mx-auto text-base md:text-lg leading-relaxed px-4">
                   Experiência real em centros de pesquisa alemães e construção de produtos de IA que escalam.
                 </p>
@@ -500,7 +803,7 @@ export default function App() {
                       <img src="/michel.png" alt="Michel Hilgemberg" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     </div>
                     <div className="flex-1 text-center lg:text-left">
-                      <h3 className="text-2xl md:text-3xl font-serif font-bold text-white mb-2 italic">Michel Hilgemberg</h3>
+                      <h3 className="text-2xl md:text-3xl font-semibold text-white mb-2 tracking-tight">Michel Hilgemberg</h3>
                       <div className="w-12 h-1 bg-brand-accent/30 mb-6 group-hover:w-20 transition-all mx-auto lg:mx-0"></div>
                       <ul className="space-y-4 text-left">
                         {[
@@ -531,7 +834,7 @@ export default function App() {
                       <img src="/lucas.png" alt="Lucas Xiang Yu" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     </div>
                     <div className="flex-1 text-center lg:text-left">
-                      <h3 className="text-2xl md:text-3xl font-serif font-bold text-white mb-2 italic">Lucas Xiang Yu</h3>
+                      <h3 className="text-2xl md:text-3xl font-semibold text-white mb-2 tracking-tight">Lucas Xiang Yu</h3>
                       <div className="w-12 h-1 bg-brand-accent/30 mb-6 group-hover:w-20 transition-all mx-auto lg:mx-0"></div>
                       <ul className="space-y-4 text-left">
                         {[
@@ -554,7 +857,7 @@ export default function App() {
         </section>
 
         {/* Depoimentos */}
-        <section id="depoimentos" className="py-20 bg-[#070D0D] overflow-hidden">
+        <section id="depoimentos" className="py-20 bg-[#FFF7EC] overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 mb-14">
             <motion.div
               initial="hidden"
@@ -563,46 +866,30 @@ export default function App() {
               variants={revealVariants}
               className="text-center"
             >
-              <span className="inline-block px-3 py-1 bg-brand-tag text-brand-accent text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
+              <span className="inline-block px-3 py-1 bg-[#042F34] text-[#B5F2DB] text-xs font-bold tracking-widest rounded-full mb-4 border border-brand-accent/20 uppercase">
                 DEPOIMENTOS
               </span>
-              <h2 className="text-4xl md:text-5xl font-serif text-white mb-3">O que estão falando</h2>
-              <p className="text-white/50 text-lg">Prints direto do WhatsApp — sem edição, sem roteiro.</p>
+              <h2 className="text-4xl md:text-5xl font-semibold text-[#070D0D] mb-3 tracking-tight">O que estão falando</h2>
+              <p className="text-[#070D0D] text-lg">Prints direto do WhatsApp — sem edição, sem roteiro.</p>
             </motion.div>
           </div>
 
-          <div className="space-y-5">
-            {testimonialRows.map((row, rowIndex) => (
-              <div key={rowIndex} className="overflow-hidden py-3">
-                <div className={`flex gap-5 px-2 ${rowIndex === 0 ? 'testimonials-track-left' : 'testimonials-track-right'}`}>
-                  {[...row, ...row].map((t, i) => (
+          <div className="space-y-20">
+            {depoimentoRows.map((row, rowIndex) => (
+              <div key={rowIndex} className="overflow-hidden py-2">
+                <div className={`flex gap-6 px-2 items-start ${rowIndex === 0 ? 'testimonials-track-left' : 'testimonials-track-right'}`}>
+                  {[...row, ...row].map((item, i) => (
                     <div
                       key={i}
-                      className="shrink-0 w-[230px] sm:w-[260px] rounded-2xl overflow-hidden shadow-2xl shadow-black/50"
-                      style={{ transform: `rotate(${t.rotation}deg)` }}
+                      className="shrink-0 rounded-2xl overflow-hidden shadow-2xl shadow-black/30"
+                      style={{ transform: `rotate(${item.rotation}deg)` }}
                     >
-                      <div className="bg-[#075E54] px-3 py-2.5 flex items-center gap-2.5">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0"
-                          style={{ backgroundColor: t.color }}
-                        >
-                          {t.initials}
-                        </div>
-                        <div>
-                          <div className="text-white text-[13px] font-semibold leading-none">{t.name}</div>
-                          <div className="text-[#B2DFDB] text-[10px] mt-0.5">online</div>
-                        </div>
-                      </div>
-                      <div className="bg-[#E5DDD5] px-3 py-3 space-y-2">
-                        {t.msgs.map((msg, mi) => (
-                          <div key={mi} className="flex justify-start">
-                            <div className="bg-white rounded-xl rounded-tl-[4px] px-3 py-2 max-w-[90%] shadow-sm">
-                              <p className="text-[12px] text-gray-800 leading-snug">{msg}</p>
-                              <div className="text-[9px] text-gray-400 text-right mt-1">{t.time} ✓✓</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <img
+                        src={item.src}
+                        alt="Depoimento"
+                        className="w-[300px] sm:w-[360px] h-auto block"
+                        draggable={false}
+                      />
                     </div>
                   ))}
                 </div>
@@ -612,22 +899,23 @@ export default function App() {
         </section>
 
         {/* Pricing */}
-        <section id="preco" className="py-24 bg-[#FFF7EC]">
-          <div className="max-w-7xl mx-auto px-6 text-center">
+        <section id="preco" className="py-24 bg-[#0A0F0F] relative overflow-hidden">
+          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-40" starColor="#FFF7EC" starCount={360} />
+          <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={revealVariants}
             >
-              <h2 className="text-5xl md:text-6xl font-serif mb-16 italic text-[#070D0D]">Garanta sua vaga</h2>
+              <h2 className="text-5xl md:text-6xl font-semibold mb-16 text-white tracking-tight">Garanta sua vaga</h2>
 
               {/* Two-card layout */}
-              <div className="flex flex-col md:flex-row items-start gap-6 max-w-5xl mx-auto mb-10">
+              <div className="flex flex-col md:flex-row items-stretch gap-6 max-w-5xl mx-auto mb-10">
 
                 {/* Card 1 — Workshop */}
-                <div className="flex-1 w-full bg-white text-[#070D0D] p-8 rounded-3xl relative shadow-xl shadow-[#070D0D]/10 border border-[#070D0D]/10">
-                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#070D0D] text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
+                <div className="flex-1 w-full bg-white text-[#070D0D] p-8 rounded-3xl relative shadow-xl shadow-black/30 border border-white/10 flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/40">
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-[#070D0D] border border-[#070D0D]/10 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
                     Workshop
                   </span>
 
@@ -637,7 +925,7 @@ export default function App() {
 
                   <hr className="mb-6 mt-6 border-[#070D0D]/10" />
 
-                  <ul className="text-left space-y-3 mb-8 text-sm">
+                  <ul className="text-left space-y-3 text-sm flex-1">
                     <li className="flex items-center gap-3 text-[#070D0D] font-medium">
                       <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> 8h de treinamento ao vivo
                     </li>
@@ -658,66 +946,70 @@ export default function App() {
                     </li>
                   </ul>
 
-                  <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-accent/20 flex items-center justify-center gap-2 active:scale-95">
-                    Quero o ingresso <ArrowRight size={18} />
-                  </button>
-                  <p className="mt-3 text-[11px] text-[#070D0D]/35 text-center">Pagamento seguro · Garantia de 7 dias</p>
+                  <div className="mt-auto pt-8">
+                    <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-accent/20 flex items-center justify-center gap-2 active:scale-95">
+                      Quero o ingresso <ArrowRight size={18} />
+                    </button>
+                    <p className="mt-3 text-[11px] text-[#070D0D]/35 text-center">Pagamento seguro · Garantia de 7 dias</p>
+                  </div>
                 </div>
 
                 {/* Between-cards text */}
-                <div className="w-full md:w-36 shrink-0 md:self-center py-2 md:py-0">
-                  <p className="text-sm italic text-[#070D0D]/50 text-center leading-relaxed">
+                <div className="w-full md:w-36 shrink-0 self-center py-2 md:py-0">
+                  <p className="text-sm text-white/50 text-center leading-relaxed">
                     "A diferença entre os planos não é o conteúdo — é a velocidade. No Workshop você aprende. Na Mentoria você implementa, com alguém do seu lado."
                   </p>
                 </div>
 
                 {/* Card 2 — Workshop + Mentoria */}
-                <div className="flex-1 w-full bg-[#070D0D] text-white p-8 rounded-3xl relative shadow-2xl border border-brand-accent/25">
+                <div className="flex-1 w-full bg-brand-tag text-[#042F34] p-8 rounded-3xl relative shadow-2xl shadow-brand-accent/10 border border-brand-accent/20 flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-accent/20">
                   <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-accent text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
                     Mais Popular
                   </span>
 
-                  <p className="text-sm text-white/55 italic text-center mb-4 mt-2">
+                  <p className="text-sm text-[#042F34]/60 text-center mb-4 mt-2">
                     Menos de R$ 38/semana com um especialista no seu negócio.
                   </p>
 
                   <div className="flex items-center justify-center gap-3 mb-1">
                     <span className="text-4xl font-bold text-brand-accent">R$ 197</span>
                   </div>
-                  <p className="text-white/35 text-[12px] text-center mb-6">Workshop + 2 encontros de mentoria</p>
+                  <p className="text-[#042F34]/50 text-[12px] text-center mb-6">Workshop + 2 encontros de mentoria</p>
 
-                  <hr className="mb-6 border-white/10" />
+                  <hr className="mb-6 border-[#042F34]/20" />
 
-                  <ul className="text-left space-y-3 mb-8 text-sm">
-                    <li className="flex items-start gap-3 text-white font-bold">
+                  <ul className="text-left space-y-3 text-sm flex-1">
+                    <li className="flex items-start gap-3 text-[#042F34] font-bold">
                       <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Tudo do Ingresso, mais:
                     </li>
-                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
                       <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> 2 encontros ao vivo de 1h com mentor
                     </li>
-                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
                       <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Aplicação direta no seu negócio
                     </li>
-                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
                       <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Revisão dos seus prompts e automações
                     </li>
-                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
                       <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Acesso direto via WhatsApp
                     </li>
-                    <li className="flex items-start gap-3 text-white/75 font-medium">
+                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
                       <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Plano de implementação personalizado
                     </li>
                   </ul>
 
-                  <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
-                    Quero Workshop + Mentoria <ArrowRight size={20} />
-                  </button>
-                  <p className="mt-3 text-[11px] text-white/30 text-center">Pagamento seguro · Garantia de 7 dias · Vagas limitadas</p>
+                  <div className="mt-auto pt-8">
+                    <button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
+                      Quero Workshop + Mentoria <ArrowRight size={20} />
+                    </button>
+                    <p className="mt-3 text-[11px] text-[#042F34]/50 text-center">Pagamento seguro · Garantia de 7 dias · Vagas limitadas</p>
+                  </div>
                 </div>
               </div>
 
               {/* Below both cards */}
-              <p className="text-sm text-[#070D0D]/45 text-center max-w-md mx-auto leading-relaxed">
+              <p className="text-sm text-white/40 text-center max-w-md mx-auto leading-relaxed">
                 🔒 Garantia incondicional de 7 dias. Se não for o que esperava, devolvemos 100% — sem perguntas.
               </p>
             </motion.div>
@@ -727,19 +1019,25 @@ export default function App() {
         {/* FAQ */}
         <section id="faq" className="py-24 bg-[#070D0D]">
           <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-4xl md:text-5xl font-serif text-white text-center mb-16 italic">Perguntas frequentes</h2>
+            <h2 className="text-4xl md:text-5xl font-semibold text-white text-center mb-16 tracking-tight">Perguntas frequentes</h2>
 
             <div className="space-y-4">
               {[
-                { q: "Preciso saber programar para participar?", a: "Não. O workshop é 100% prático e acessível para qualquer pessoa. Nenhuma linha de código é necessária." },
-                { q: "O workshop é ao vivo ou gravado?", a: "Ao vivo, das 10h às 18h. A gravação fica disponível por 12 meses." },
-                { q: "Funciona para qualquer tipo de negócio?", a: "Sim. Os exemplos cobrem e-commerce, serviços, infoprodutos e B2B." },
-                { q: "Qual plano do Claude preciso ter?", a: "O gratuito funciona para acompanhar. O Pro potencializa os resultados." },
-                { q: "E se eu não gostar?", a: "Garantia total de 7 dias. Sem perguntas, sem burocracia." }
+                { q: "Preciso saber programar para participar?", a: "Não. O módulo de Code ensina do zero, desde instalar o terminal até rodar seu primeiro projeto. Quem já programa vai aproveitar os módulos avançados de Skills e integrações." },
+                { q: "O workshop é ao vivo ou gravado?", a: "Ao vivo, com interação em tempo real. A gravação fica disponível por 12 meses para você revisitar qualquer módulo." },
+                { q: "Funciona para qualquer tipo de negócio?", a: "Sim. Os recursos do Claude (Chat, Cowork e Code) se aplicam a qualquer área. No workshop, usamos exemplos de gestão, conteúdo, vendas, operações e análise de dados." },
+                { q: "Qual plano do Claude preciso ter?", a: "O plano gratuito funciona para acompanhar o módulo de Chat. Para Cowork e Code, o plano Pro é recomendado. No módulo de tokens, ensinamos como fazer o Pro render a semana inteira." },
+                { q: "E se eu não gostar?", a: "Garantia total de 7 dias. Sem perguntas, sem burocracia." },
+                { q: "Qual a diferença entre Chat, Cowork e Code?", a: "Chat é a interface web que você já conhece. Cowork é o Claude operando direto no seu computador, acessando seus arquivos e executando tarefas. Code é o Claude no terminal, onde ele constrói aplicações, instala skills e se conecta a APIs." },
+                { q: "Eu já uso o Claude no chat todo dia. Vai ter conteúdo pra mim?", a: "Com certeza. O módulo de Chat cobre recursos avançados que a maioria não usa: Projects, artefatos interativos, plugins com Google Drive e Gmail. E os módulos de Cowork e Code são território novo pra 95% dos usuários." },
+                { q: "Preciso ter Mac ou funciona no Windows?", a: "Funciona nos dois. No workshop, cobrimos a instalação e configuração para ambos os sistemas operacionais." },
+                { q: "Vou sair com algo funcionando ou é só teoria?", a: "Cada módulo tem aplicação prática. Você vai configurar Projects, conectar plugins, rodar automações no Cowork e construir algo funcional no Code. Tudo durante o workshop." },
+                { q: "Posso usar o que aprendi com outras IAs além do Claude?", a: "Os fundamentos de prompt, estrutura de contexto e lógica de automação se aplicam a qualquer modelo. Mas os módulos de Cowork, Code e Skills são exclusivos do ecossistema Claude — e são justamente o diferencial do workshop." },
+                { q: "Meus tokens vão acabar durante o workshop?", a: "Improvável. No início, ensinamos as configurações que otimizam o consumo. E as práticas são pensadas pra não estourar seu plano no processo." }
               ].map((item, i) => (
                 <details key={i} className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all">
                   <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
-                    <span className="text-lg font-bold text-white pr-4">{item.q}</span>
+                    <span className="text-lg font-semibold text-white pr-4">{item.q}</span>
                     <ChevronDown className="text-brand-accent transition-transform group-open:rotate-180" size={20} />
                   </summary>
                   <div className="px-6 pb-6 text-white/50 leading-relaxed">
@@ -763,7 +1061,7 @@ export default function App() {
               <div className="absolute inset-0 opacity-10 pointer-events-none noise-overlay"></div>
 
               <div className="relative z-10 px-4">
-                <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif mb-6 italic leading-tight">Claude Sem Frescura.<br />Resultado de verdade.</h2>
+                <h2 className="text-4xl sm:text-5xl md:text-7xl font-semibold mb-6 leading-tight tracking-tighter">Claude Sem Frescura.<br />Resultado de verdade.</h2>
                 <p className="text-white/80 text-lg sm:text-xl font-medium mb-12 max-w-xl mx-auto">
                   Uma vaga. Um dia. Uma mudança real no seu negócio.
                 </p>
