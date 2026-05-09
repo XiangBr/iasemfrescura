@@ -240,7 +240,7 @@ export default function App() {
 
           <a
             href="#preco"
-            className="bg-brand-accent hover:bg-brand-accent-hover text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-lg shadow-brand-accent/20 active:scale-95"
+            className="bg-brand-accent hover:bg-brand-accent-hover text-white px-3 py-2 md:px-6 md:py-2.5 rounded-full text-sm md:text-base font-semibold transition-all shadow-lg shadow-brand-accent/20 active:scale-95 whitespace-nowrap"
           >
             Garantir Vaga
           </a>
@@ -249,7 +249,7 @@ export default function App() {
 
       <main>
         {/* Hero Section */}
-        <section id="hero" className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden  min-h-screen flex items-center bg-linear-to-br from-[#070D0D] via-[#3E2723]/20 to-[#420D19]/30">
+        <section id="hero" className="relative pt-32 pb-20 md:pt-32 md:pb-32 overflow-hidden  min-h-screen flex items-center bg-linear-to-br from-[#070D0D] via-[#3E2723]/20 to-[#420D19]/30">
           <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none" starColor="#FFF7EC" starCount={600} />
           <div className="max-w-9xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -489,7 +489,7 @@ export default function App() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 "Usa o Claude (ou outra IA) só no modo chat e sabe que dá pra fazer mais",
-                "Quer criar landing pages e funis sem depender de dev",
+                "Perde tempo repetindo tarefas manuais que o Claude automatizaria em minutos",
                 "Já tentou criar algo mais avançado mas travou nos limites da ferramenta",
                 "Quer que a IA execute tarefas por você, não só responda perguntas",
                 "Precisa processar documentos, planilhas ou arquivos sem fazer tudo na mão",
@@ -515,7 +515,7 @@ export default function App() {
 
         {/* "O Que Você Vai Construir" Section */}
         <section id="workshop" className="py-24 bg-[#0A0F0F] relative overflow-hidden">
-          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-60" starColor="#FFF7EC" starCount={110} />
+          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-60" starColor="#FFF7EC" starCount={600} />
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             <motion.div
               initial="hidden"
@@ -563,10 +563,10 @@ export default function App() {
                 >
                   {/* single direct child so .glass3d > * z-index rule applies here */}
                   <div className="relative">
-                    <span className="text-5xl text-[#B5F2DB] absolute top-0 right-0 font-bold  transition-colors pointer-events-none select-none">
+                    <span className="text-3xl md:text-5xl text-[#B5F2DB] absolute top-0 right-0 font-bold transition-colors pointer-events-none select-none">
                       {item.id}
                     </span>
-                    <h3 className="text-2xl font-semibold text-white mb-4 tracking-tight">{item.title}</h3>
+                    <h3 className="text-2xl font-semibold text-white mb-4 tracking-tight pr-10 md:pr-0">{item.title}</h3>
                     <p className="text-white/70 text-lg leading-relaxed">{item.desc}</p>
                   </div>
                 </motion.div>
@@ -771,7 +771,7 @@ export default function App() {
 
         {/* Mentors Section */}
         <section id="mentores" className="py-24 md:py-32 bg-[#0A0F0F] relative overflow-hidden">
-          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-50" starColor="#FFF7EC" starCount={100} />
+          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-50" starColor="#FFF7EC" starCount={600} />
           <div className="max-w-7xl mx-auto px-6 relative z-10">
              <motion.div
                 initial="hidden"
@@ -899,7 +899,7 @@ export default function App() {
 
         {/* Pricing */}
         <section id="preco" className="py-24 bg-[#0A0F0F] relative overflow-hidden">
-          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-40" starColor="#FFF7EC" starCount={360} />
+          <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none opacity-40" starColor="#FFF7EC" starCount={600} />
           <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
             <motion.div
               initial="hidden"

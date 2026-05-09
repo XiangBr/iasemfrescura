@@ -132,7 +132,7 @@
   }
 
   .claude-ui__msg--user {
-    @apply bg-[#741E31] text-[#FFF7EC] self-end rounded-br-[4px];
+    @apply bg-[#042F34] text-[#B5F2DB] self-end rounded-br-[4px];
   }
 
   .claude-ui__msg--claude {
@@ -219,6 +219,16 @@
   .testimonials-track-right {
     animation: scrollRight 45s linear infinite;
     will-change: transform;
+  }
+
+  @media (max-width: 767px) {
+    .testimonials-track-left {
+      animation: scrollLeft 18s linear infinite;
+    }
+
+    .testimonials-track-right {
+      animation: scrollRight 18s linear infinite;
+    }
   }
 
   .glass3d {
