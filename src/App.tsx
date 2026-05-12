@@ -17,8 +17,8 @@ import {
 import { StarsBackground } from './StarsBackground';
 
 // ── Vagas de mentoria — atualizar conforme vendas ──
-const MENTORIA_VAGAS_PREENCHIDAS = 4;
-const MENTORIA_VAGAS_TOTAL = 20;
+const MENTORIA_VAGAS_PREENCHIDAS = 2;
+const MENTORIA_VAGAS_TOTAL = 10;
 
 function getLoteInfo() {
   const now = new Date();
@@ -1178,10 +1178,10 @@ export default function App() {
       <footer className="py-12 bg-[#070D0D] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold tracking-[0.2em] uppercase text-white/50">
           <div>
-            © 2025 Claude Sem Frescura
+            © 2026 Claude Sem Frescura
           </div>
           <div className="flex gap-8 lowercase opacity-50 font-medium font-sans">
-            <span>contato@iasemfrescura.com.br</span>
+            <span>contato@iasemfrescura.com</span>
             <span>termos de uso</span>
           </div>
         </div>
