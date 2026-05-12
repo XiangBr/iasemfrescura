@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import {
   Check,
-  X,
   ChevronDown,
   ArrowRight,
   Zap,
@@ -16,6 +15,35 @@ import {
   Clock,
 } from 'lucide-react';
 import { StarsBackground } from './StarsBackground';
+
+// ── Vagas de mentoria — atualizar conforme vendas ──
+const MENTORIA_VAGAS_PREENCHIDAS = 4;
+const MENTORIA_VAGAS_TOTAL = 20;
+
+function getLoteInfo() {
+  const now = new Date();
+  const lote1Start = new Date('2026-05-12');
+  const lote1End = new Date('2026-05-20');
+  const lote2End = new Date('2026-06-05');
+
+  if (now < lote1Start) {
+    return { lote: 1, price: '59,90', percent: 12, nextPrice: '79,90' };
+  } else if (now < lote1End) {
+    const total = lote1End.getTime() - lote1Start.getTime();
+    const elapsed = now.getTime() - lote1Start.getTime();
+    const progress = elapsed / total;
+    const percent = Math.round(15 + progress * 75);
+    return { lote: 1, price: '59,90', percent, nextPrice: '79,90' };
+  } else if (now < lote2End) {
+    const total = lote2End.getTime() - lote1End.getTime();
+    const elapsed = now.getTime() - lote1End.getTime();
+    const progress = elapsed / total;
+    const percent = Math.round(12 + progress * 73);
+    return { lote: 2, price: '79,90', percent, nextPrice: null };
+  } else {
+    return { lote: 2, price: '79,90', percent: 87, nextPrice: null };
+  }
+}
 
 const JourneyMilestone = ({ icon: Icon, title, time, schedule, description, details, side = 'left', active, onClick, caseExtra }: any) => {
   return (
@@ -135,6 +163,7 @@ const PathNode = ({ icon: Icon, title, side = 'left', top, visible = true }: any
 );
 
 export default function App() {
+  const loteInfo = getLoteInfo();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   const [chatPhase, setChatPhase] = useState(0);
@@ -142,8 +171,21 @@ export default function App() {
   const words = [  "além do Chat", "de verdade", "por completo"];
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const urgencyBarRef = useRef<HTMLDivElement>(null);
+  const [urgencyBarHeight, setUrgencyBarHeight] = useState(40);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
   const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  useEffect(() => {
+    const measure = () => {
+      if (urgencyBarRef.current) {
+        setUrgencyBarHeight(urgencyBarRef.current.offsetHeight);
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -197,7 +239,28 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070D0D] relative selection:bg-brand-tag text-brand-text">
+    <div className="min-h-screen bg-[#042F34] relative selection:bg-brand-tag text-brand-text">
+      {/* Urgency Bar */}
+      <div className="urgency-bar" ref={urgencyBarRef}>
+        <div className="urgency-bar__inner">
+          <div className="urgency-bar__badge">
+            AO VIVO 06/06
+          </div>
+          <div className="urgency-bar__progress">
+            <div className="urgency-bar__track">
+              <div className="urgency-bar__fill" style={{ width: `${loteInfo.percent}%` }} />
+            </div>
+            <span>
+              {loteInfo.percent}% vendidos | {loteInfo.lote}° Lote
+              <span className="urgency-bar__price"> — R$ {loteInfo.price}</span>
+            </span>
+          </div>
+          {loteInfo.nextPrice && (
+            <span className="urgency-bar__next">⚡ 2° lote: R$ {loteInfo.nextPrice}</span>
+          )}
+        </div>
+      </div>
+
       {/* Artistic Flair Dots Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-screen bg-dots z-0"></div>
 
@@ -219,14 +282,15 @@ export default function App() {
 
       {/* Navigation */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent ${
+        className={`fixed left-0 right-0 z-50 transition-all duration-300 border-b border-transparent ${
           isScrolled ? 'bg-[#070D0D]/90 backdrop-blur-md border-white/5 shadow-lg py-4' : 'bg-transparent py-6'
         }`}
+        style={{ top: `${urgencyBarHeight}px` }}
       >
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
              <img src="/claude_logo.png" alt="Claude" className="w-8 h-8 rounded-lg brightness-110" />
-             <a href="#" className="text-2xl text-[#DA7756] font-semibold tracking-tight">
+             <a href="#" className="text-lg sm:text-2xl text-[#DA7756] font-semibold tracking-tight whitespace-nowrap">
               Claude Sem Frescura
             </a>
           </div>
@@ -249,7 +313,7 @@ export default function App() {
 
       <main>
         {/* Hero Section */}
-        <section id="hero" className="relative pt-32 pb-20 md:pt-32 md:pb-32 overflow-hidden  min-h-screen flex items-center bg-linear-to-br from-[#070D0D] via-[#3E2723]/20 to-[#420D19]/30">
+        <section id="hero" className="relative pt-32 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-[#0A0F0F]  min-h-screen flex items-center bg-linear-to-br from-[#070D0D] via-[#3E2723]/20 to-[#420D19]/30">
           <StarsBackground className="absolute inset-0 w-full h-full pointer-events-none" starColor="#FFF7EC" starCount={600} />
           <div className="max-w-9xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -291,16 +355,16 @@ export default function App() {
                 Sem frescura e com aplicações no seu trabalho.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mb-14 px-4 sm:px-0">
+              <div className="flex flex-col sm:flex-row md:flex-col xl:flex-row gap-4 sm:gap-5 mb-14 px-4 sm:px-0">
                 <a
                   href="#preco"
-                  className="bg-brand-accent hover:bg-brand-accent-hover text-white px-8 sm:px-10 py-5 rounded-full text-lg font-bold flex items-center justify-center gap-3 transition-all shadow-2xl shadow-brand-accent/30 hover:scale-105 active:scale-95 w-full sm:w-auto"
+                  className="bg-brand-accent hover:bg-brand-accent-hover text-white px-8 py-4 sm:py-5 rounded-full text-base sm:text-lg font-bold flex items-center justify-center gap-3 transition-all shadow-2xl shadow-brand-accent/30 hover:scale-105 active:scale-95 w-full sm:w-auto md:w-full xl:w-auto"
                 >
-                  Quero minha vaga <ArrowRight size={22} />
+                  Quero minha vaga <ArrowRight size={20} />
                 </a>
                 <a
                   href="#programacao"
-                  className="border border-white/10 hover:border-brand-accent/50 text-white px-8 sm:px-10 py-5 rounded-full text-lg font-bold flex items-center justify-center transition-all bg-white/5 backdrop-blur-md w-full sm:w-auto"
+                  className="border border-white/10 hover:border-brand-accent/50 text-white px-8 py-4 sm:py-5 rounded-full text-base sm:text-lg font-bold flex items-center justify-center transition-all bg-white/5 backdrop-blur-md w-full sm:w-auto md:w-full xl:w-auto"
                 >
                   Ver programação
                 </a>
@@ -599,7 +663,7 @@ export default function App() {
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <div className="flex items-center gap-2 bg-[#042F34] border border-brand-accent/25 px-5 py-2.5 rounded-full shadow-sm">
                   <Calendar size={15} className="text-[#B5F2DB]" />
-                  <span className="text-sm font-semibold text-[#B5F2DB] tracking-tight">30 de Maio, 2026</span>
+                  <span className="text-sm font-semibold text-[#B5F2DB] tracking-tight">6 de Junho, 2026</span>
                 </div>
                 <div className="flex items-center gap-2 bg-[#042F34] border border-brand-accent/25 px-5 py-2.5 rounded-full shadow-sm">
                   <Clock size={15} className="text-[#B5F2DB]" />
@@ -699,15 +763,15 @@ export default function App() {
 
                 <JourneyMilestone
                   time="Módulo 2 — Claude Cowork"
-                  schedule="13h00 → 15h00"
+                  schedule="14h00 → 15h00"
                   icon={Users}
                   title="Você pede. O Claude executa."
                   description="O Claude sai do navegador e entra no seu computador. Acesso a arquivos locais e tarefas sem supervisão manual."
                   details={[
                    { label: "Setup", desc: "Configure o Cowork com acesso às pastas e ferramentas do seu trabalho", icon: Zap },
                   { label: "Processamento", desc: "Cruze dados de múltiplas planilhas e gere relatórios consolidados automaticamente", icon: Layout },
-                  { label: "Análise em lote", desc: "Entregue 50 contratos e receba uma tabela comparativa com prazos, valores e riscos", icon: Check },
-                  { label: "Fluxos completos", desc: "Leia emails → extraia anexos → processe os dados → atualize sua planilha de controle", icon: ArrowRight }
+                  { label: "Tarefas autônomas", desc: "O Claude executa sequências de ações no seu computador enquanto você faz outra coisa", icon: Check },
+                  { label: "Rotinas sob demanda", desc: "Crie comandos que disparam fluxos inteiros — pesquisa, síntese e entrega — com uma instrução", icon: ArrowRight }
                   ]}
                   caseExtra="Automação real que substitui um processo manual da sua rotina."
                   side="right"
@@ -717,7 +781,7 @@ export default function App() {
 
                 <JourneyMilestone
                   time="Módulo 3 — Claude Code"
-                  schedule="15h30 → 17h30"
+                  schedule="15h00 → 17h30"
                   icon={Terminal}
                   title="Você planeja. Ele constrói."
                   description="Criação de aplicações, scripts e sistemas direto do terminal. Não precisa ser programador, precisa saber pedir."
@@ -785,7 +849,7 @@ export default function App() {
                 </span>
                 <h2 className="text-4xl md:text-6xl font-semibold text-white mb-6 tracking-tight">Seus mentores nessa imersão</h2>
                 <p className="text-white/50 max-w-2xl mx-auto text-base md:text-lg leading-relaxed px-4">
-                  Experiência real em centros de pesquisa alemães e construção de produtos de IA que escalam.
+                  Experiência real com pesquisa e construção de produtos de IA que escalam.
                 </p>
               </motion.div>
 
@@ -918,15 +982,43 @@ export default function App() {
                     Workshop
                   </span>
 
-                  <div className="flex flex-wrap items-center justify-center gap-3 mb-2 mt-2">
-                    <span className="text-4xl font-bold text-brand-accent">R$ 49,90</span>
+                  {/* Lote badge */}
+                  <div className="flex items-center justify-center gap-2 mt-2 mb-3">
+                    <span className="bg-[#042F34] text-[#B5F2DB] text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 rounded-full">
+                      {loteInfo.lote}° Lote
+                    </span>
+                    {loteInfo.nextPrice && (
+                      <span className="text-[10px] text-[#070D0D]/45 font-medium">próximo: R$ {loteInfo.nextPrice}</span>
+                    )}
                   </div>
 
-                  <hr className="mb-6 mt-6 border-[#070D0D]/10" />
+                  <div className="flex flex-wrap items-center justify-center gap-3 mb-3">
+                    <span className="text-4xl font-bold text-brand-accent">R$ {loteInfo.price}</span>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="mb-2">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-[11px] text-[#070D0D]/50 font-medium">{loteInfo.percent}% dos ingressos vendidos</span>
+                      <span className="text-[11px] text-[#042F34] font-bold">{100 - loteInfo.percent}% restantes</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#070D0D]/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${loteInfo.percent}%`,
+                          background: 'linear-gradient(90deg, #042F34, #B5F2DB)',
+                          transition: 'width 1s ease',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <hr className="mb-6 mt-4 border-[#070D0D]/10" />
 
                   <ul className="text-left space-y-3 text-sm flex-1">
                     <li className="flex items-center gap-3 text-[#070D0D] font-medium">
-                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> 8h de treinamento ao vivo
+                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> 6h de treinamento ao vivo
                     </li>
                     <li className="flex items-center gap-3 text-[#070D0D] font-medium">
                       <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> Gravação por 12 meses
@@ -934,14 +1026,14 @@ export default function App() {
                     <li className="flex items-center gap-3 text-[#070D0D] font-medium">
                       <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> Materiais e templates
                     </li>
-                    <li className="flex items-center gap-3 text-[#070D0D]/30 line-through">
-                      <X size={16} className="text-[#070D0D]/30 shrink-0" strokeWidth={2.5} /> Mentoria personalizada
+                    <li className="flex items-center gap-3 text-[#070D0D] font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> Cases práticos com I.A
                     </li>
-                    <li className="flex items-center gap-3 text-[#070D0D]/30 line-through">
-                      <X size={16} className="text-[#070D0D]/30 shrink-0" strokeWidth={2.5} /> Acompanhamento semanal
+                    <li className="flex items-center gap-3 text-[#070D0D] font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> Automações construídas ao vivo
                     </li>
-                    <li className="flex items-center gap-3 text-[#070D0D]/30 line-through">
-                      <X size={16} className="text-[#070D0D]/30 shrink-0" strokeWidth={2.5} /> Aplicação no seu negócio
+                    <li className="flex items-center gap-3 text-[#070D0D] font-medium">
+                      <Check size={16} className="text-brand-accent shrink-0" strokeWidth={3} /> Projetos funcionais no dia
                     </li>
                   </ul>
 
@@ -953,25 +1045,35 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Between-cards text */}
-                <div className="w-full md:w-36 shrink-0 self-center py-2 md:py-0">
-                  <p className="text-sm text-white/50 text-center leading-relaxed">
-                    "A diferença entre os planos não é o conteúdo — é a velocidade. No Workshop você aprende. Na Mentoria você implementa, com alguém do seu lado."
-                  </p>
-                </div>
-
                 {/* Card 2 — Workshop + Mentoria */}
                 <div className="flex-1 w-full bg-brand-tag text-[#042F34] p-8 rounded-3xl relative shadow-2xl shadow-brand-accent/10 border border-brand-accent/20 flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-accent/20">
                   <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-accent text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
-                    Mais Popular
+                    Mentoria
                   </span>
 
-                  <p className="text-sm text-[#042F34]/60 text-center mb-4 mt-2">
-                    Menos de R$ 38/semana com um especialista no seu negócio.
-                  </p>
+                  {/* Vagas limitadas */}
+                  <div className="mt-3 mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-black text-[#042F34] uppercase tracking-[0.2em]">Vagas limitadas</span>
+                      <span className="text-[10px] font-bold text-[#042F34]/70">
+                        {MENTORIA_VAGAS_TOTAL - MENTORIA_VAGAS_PREENCHIDAS} de {MENTORIA_VAGAS_TOTAL} restantes
+                      </span>
+                    </div>
+                    <div className="flex gap-[3px] flex-wrap mb-1.5">
+                      {Array.from({ length: MENTORIA_VAGAS_TOTAL }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-3 rounded-[2px] flex-1 ${i < MENTORIA_VAGAS_PREENCHIDAS ? 'bg-[#042F34]' : 'bg-[#042F34]/15'}`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-[#042F34]/55 font-medium text-right">
+                      {MENTORIA_VAGAS_PREENCHIDAS} vagas preenchidas
+                    </p>
+                  </div>
 
                   <div className="flex items-center justify-center gap-3 mb-1">
-                    <span className="text-4xl font-bold text-brand-accent">R$ 197</span>
+                    <span className="text-4xl font-bold text-brand-accent">R$ 297</span>
                   </div>
                   <p className="text-[#042F34]/50 text-[12px] text-center mb-6">Workshop + 2 encontros de mentoria</p>
 
@@ -1064,9 +1166,9 @@ export default function App() {
                 <p className="text-white/80 text-lg sm:text-xl font-medium mb-12 max-w-xl mx-auto">
                   Uma vaga. Um dia. Uma mudança real no seu negócio.
                 </p>
-                <button className="bg-white text-brand-accent hover:bg-neutral-100 px-8 sm:px-12 py-4 sm:py-5 rounded-full text-xl sm:text-2xl font-bold transition-all shadow-2xl active:scale-95 w-full sm:w-auto">
+                <a href="#preco" className="inline-block bg-white text-brand-accent hover:bg-neutral-100 px-8 sm:px-12 py-4 sm:py-5 rounded-full text-xl sm:text-2xl font-bold transition-all shadow-2xl active:scale-95 w-full sm:w-auto text-center">
                   Garantir minha vaga →
-                </button>
+                </a>
               </div>
             </motion.div>
           </div>
