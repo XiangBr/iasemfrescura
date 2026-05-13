@@ -22,7 +22,7 @@ const MENTORIA_VAGAS_TOTAL = 10;
 
 function getLoteInfo() {
   const now = new Date();
-  const lote1Start = new Date('2026-05-12');
+  const lote1Start = new Date('2026-05-14');
   const lote1End = new Date('2026-05-20');
   const lote2End = new Date('2026-06-05');
 
