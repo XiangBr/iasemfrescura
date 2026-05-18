@@ -17,7 +17,7 @@ import {
 import { StarsBackground } from './StarsBackground';
 
 // ── Vagas de mentoria — atualizar conforme vendas ──
-const MENTORIA_VAGAS_PREENCHIDAS = 8;
+const MENTORIA_VAGAS_PREENCHIDAS = 9;
 const MENTORIA_VAGAS_TOTAL = 10;
 
 function getLoteInfo() {
