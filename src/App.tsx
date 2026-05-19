@@ -17,14 +17,16 @@ import {
 import { StarsBackground } from './StarsBackground';
 
 // ── Vagas de mentoria — atualizar conforme vendas ──
-const MENTORIA_VAGAS_PREENCHIDAS = 9;
+const MENTORIA_VAGAS_PREENCHIDAS = 10;
 const MENTORIA_VAGAS_TOTAL = 10;
+const MENTORIA_ESGOTADA = MENTORIA_VAGAS_PREENCHIDAS >= MENTORIA_VAGAS_TOTAL;
 
 function getLoteInfo() {
   const now = new Date();
-  const lote1Start = new Date('2026-05-12');
-  const lote1End = new Date('2026-05-19');
-  const lote2End = new Date('2026-06-05');
+  const lote1Start = new Date('2026-05-16');
+  const lote1End = new Date('2026-05-18');
+  const lote2End = new Date('2026-05-24');
+  const lote3End = new Date('2026-06-05');
 
   if (now < lote1Start) {
     return { lote: 1, price: '59,90', percent: 12, nextPrice: '79,90' };
@@ -38,10 +40,16 @@ function getLoteInfo() {
     const total = lote2End.getTime() - lote1End.getTime();
     const elapsed = now.getTime() - lote1End.getTime();
     const progress = elapsed / total;
-    const percent = Math.round(12 + progress * 73);
-    return { lote: 2, price: '79,90', percent, nextPrice: null };
+    const percent = Math.round(5 + progress * 30);
+    return { lote: 2, price: '79,90', percent, nextPrice: '97,90' };
+  } else if (now < lote3End) {
+    const total = lote3End.getTime() - lote2End.getTime();
+    const elapsed = now.getTime() - lote2End.getTime();
+    const progress = elapsed / total;
+    const percent = Math.round(7 + progress * 30);
+    return { lote: 3, price: '97,90', percent, nextPrice: null };
   } else {
-    return { lote: 2, price: '79,90', percent: 87, nextPrice: null };
+    return { lote: 3, price: '97,90', percent: 95, nextPrice: null };
   }
 }
 
@@ -256,7 +264,7 @@ export default function App() {
             </span>
           </div>
           {loteInfo.nextPrice && (
-            <span className="urgency-bar__next">⚡ 2° lote: R$ {loteInfo.nextPrice}</span>
+            <span className="urgency-bar__next">⚡ {loteInfo.lote + 1}° lote: R$ {loteInfo.nextPrice}</span>
           )}
         </div>
       </div>
@@ -1046,9 +1054,9 @@ export default function App() {
                 </div>
 
                 {/* Card 2 — Workshop + Mentoria */}
-                <div className="flex-1 w-full bg-brand-tag text-[#042F34] p-8 rounded-3xl relative shadow-2xl shadow-brand-accent/10 border border-brand-accent/20 flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-accent/20">
-                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-accent text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap">
-                    Mentoria
+                <div className={`flex-1 w-full bg-brand-tag text-[#042F34] p-8 rounded-3xl relative shadow-2xl border flex flex-col transition-all duration-300 ${MENTORIA_ESGOTADA ? 'opacity-60 grayscale border-[#042F34]/10 shadow-black/10 cursor-not-allowed select-none' : 'shadow-brand-accent/10 border-brand-accent/20 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-accent/20'}`}>
+                  <span className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap ${MENTORIA_ESGOTADA ? 'bg-[#042F34]/40 text-white/70' : 'bg-brand-accent text-white'}`}>
+                    {MENTORIA_ESGOTADA ? 'Esgotado' : 'Mentoria'}
                   </span>
 
                   {/* Vagas limitadas */}
@@ -1101,9 +1109,15 @@ export default function App() {
                   </ul>
 
                   <div className="mt-auto pt-8">
-                    <a href="https://pay.kiwify.com.br/ez6cNqF" target="_blank" rel="noopener noreferrer" className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
-                      Quero Workshop + Mentoria <ArrowRight size={20} />
-                    </a>
+                    {MENTORIA_ESGOTADA ? (
+                      <div className="w-full bg-[#042F34]/20 text-[#042F34]/40 py-5 rounded-2xl text-lg font-bold flex items-center justify-center gap-2 cursor-not-allowed">
+                        Vagas Esgotadas
+                      </div>
+                    ) : (
+                      <a href="https://pay.kiwify.com.br/ez6cNqF" target="_blank" rel="noopener noreferrer" className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
+                        Quero Workshop + Mentoria <ArrowRight size={20} />
+                      </a>
+                    )}
                     <p className="mt-3 text-[11px] text-[#042F34]/50 text-center">Pagamento seguro · Garantia de 7 dias · Vagas limitadas</p>
                   </div>
                 </div>
