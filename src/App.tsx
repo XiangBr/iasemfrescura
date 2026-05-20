@@ -181,6 +181,9 @@ export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const urgencyBarRef = useRef<HTMLDivElement>(null);
   const [urgencyBarHeight, setUrgencyBarHeight] = useState(40);
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [waitlistForm, setWaitlistForm] = useState({ nome: '', email: '', celular: '', descricao: '' });
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
   const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
@@ -245,6 +248,32 @@ export default function App() {
       transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] }
     }
   };
+
+  function closeWaitlistModal() {
+    setShowWaitlistModal(false);
+    setWaitlistStatus('idle');
+    setWaitlistForm({ nome: '', email: '', celular: '', descricao: '' });
+  }
+
+  async function submitWaitlist() {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(waitlistForm.email);
+    if (!waitlistForm.nome.trim() || !emailOk || waitlistForm.celular.replace(/\D/g, '').length < 10 || !waitlistForm.descricao.trim()) return;
+    setWaitlistStatus('submitting');
+    try {
+      const sheetUrl = process.env.WAITLIST_SHEET_URL;
+      if (sheetUrl) {
+        const url = new URL(sheetUrl);
+        url.searchParams.set('nome', waitlistForm.nome.trim());
+        url.searchParams.set('email', waitlistForm.email.trim());
+        url.searchParams.set('celular', waitlistForm.celular.trim());
+        url.searchParams.set('descricao', waitlistForm.descricao.trim());
+        await fetch(url.toString());
+      }
+      setWaitlistStatus('success');
+    } catch {
+      setWaitlistStatus('error');
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#042F34] relative selection:bg-brand-tag text-brand-text">
@@ -1054,72 +1083,86 @@ export default function App() {
                 </div>
 
                 {/* Card 2 — Workshop + Mentoria */}
-                <div className={`flex-1 w-full bg-brand-tag text-[#042F34] p-8 rounded-3xl relative shadow-2xl border flex flex-col transition-all duration-300 ${MENTORIA_ESGOTADA ? 'opacity-60 grayscale border-[#042F34]/10 shadow-black/10 cursor-not-allowed select-none' : 'shadow-brand-accent/10 border-brand-accent/20 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-accent/20'}`}>
-                  <span className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap ${MENTORIA_ESGOTADA ? 'bg-[#042F34]/40 text-white/70' : 'bg-brand-accent text-white'}`}>
-                    {MENTORIA_ESGOTADA ? 'Esgotado' : 'Mentoria'}
-                  </span>
+                <div className={`flex-1 w-full bg-brand-tag text-[#042F34] rounded-3xl relative shadow-2xl border flex flex-col transition-all duration-300 overflow-hidden ${MENTORIA_ESGOTADA ? 'border-[#042F34]/10 shadow-black/10' : 'shadow-brand-accent/10 border-brand-accent/20 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-accent/20'}`}>
+                  {/* Conteúdo do card — fica cinza quando esgotado */}
+                  <div className={`p-8 flex flex-col flex-1 ${MENTORIA_ESGOTADA ? 'opacity-60 grayscale select-none' : ''}`}>
+                    <span className={`self-center -mt-4 mb-4 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase shadow-lg whitespace-nowrap ${MENTORIA_ESGOTADA ? 'bg-[#042F34]/40 text-white/70' : 'bg-brand-accent text-white'}`}>
+                      {MENTORIA_ESGOTADA ? 'Esgotado' : 'Mentoria'}
+                    </span>
 
-                  {/* Vagas limitadas */}
-                  <div className="mt-3 mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-black text-[#042F34] uppercase tracking-[0.2em]">Vagas limitadas</span>
-                      <span className="text-[10px] font-bold text-[#042F34]/70">
-                        {MENTORIA_VAGAS_TOTAL - MENTORIA_VAGAS_PREENCHIDAS} de {MENTORIA_VAGAS_TOTAL} restantes
-                      </span>
-                    </div>
-                    <div className="flex gap-[3px] flex-wrap mb-1.5">
-                      {Array.from({ length: MENTORIA_VAGAS_TOTAL }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-3 rounded-[2px] flex-1 ${i < MENTORIA_VAGAS_PREENCHIDAS ? 'bg-[#042F34]' : 'bg-[#042F34]/15'}`}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-[#042F34]/55 font-medium text-right">
-                      {MENTORIA_VAGAS_PREENCHIDAS} vagas preenchidas
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-3 mb-1">
-                    <span className="text-4xl font-bold text-brand-accent">R$ 297</span>
-                  </div>
-                  <p className="text-[#042F34]/50 text-[12px] text-center mb-6">Workshop + 2 encontros de mentoria</p>
-
-                  <hr className="mb-6 border-[#042F34]/20" />
-
-                  <ul className="text-left space-y-3 text-sm flex-1">
-                    <li className="flex items-start gap-3 text-[#042F34] font-bold">
-                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Tudo do Ingresso, mais:
-                    </li>
-                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
-                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> 2 encontros ao vivo de 1h com mentor
-                    </li>
-                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
-                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Aplicação direta no seu negócio
-                    </li>
-                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
-                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Revisão dos seus prompts e automações
-                    </li>
-                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
-                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Acesso direto via WhatsApp
-                    </li>
-                    <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
-                      <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Plano de implementação personalizado
-                    </li>
-                  </ul>
-
-                  <div className="mt-auto pt-8">
-                    {MENTORIA_ESGOTADA ? (
-                      <div className="w-full bg-[#042F34]/20 text-[#042F34]/40 py-5 rounded-2xl text-lg font-bold flex items-center justify-center gap-2 cursor-not-allowed">
-                        Vagas Esgotadas
+                    {/* Vagas limitadas */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-black text-[#042F34] uppercase tracking-[0.2em]">Vagas limitadas</span>
+                        <span className="text-[10px] font-bold text-[#042F34]/70">
+                          {MENTORIA_VAGAS_TOTAL - MENTORIA_VAGAS_PREENCHIDAS} de {MENTORIA_VAGAS_TOTAL} restantes
+                        </span>
                       </div>
-                    ) : (
-                      <a href="https://pay.kiwify.com.br/ez6cNqF" target="_blank" rel="noopener noreferrer" className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
-                        Quero Workshop + Mentoria <ArrowRight size={20} />
-                      </a>
+                      <div className="flex gap-[3px] flex-wrap mb-1.5">
+                        {Array.from({ length: MENTORIA_VAGAS_TOTAL }).map((_, i) => (
+                          <div
+                            key={i}
+                            className={`h-3 rounded-[2px] flex-1 ${i < MENTORIA_VAGAS_PREENCHIDAS ? 'bg-[#042F34]' : 'bg-[#042F34]/15'}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-[#042F34]/55 font-medium text-right">
+                        {MENTORIA_VAGAS_PREENCHIDAS} vagas preenchidas
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-3 mb-1">
+                      <span className="text-4xl font-bold text-brand-accent">R$ 297</span>
+                    </div>
+                    <p className="text-[#042F34]/50 text-[12px] text-center mb-6">Workshop + 2 encontros de mentoria</p>
+
+                    <hr className="mb-6 border-[#042F34]/20" />
+
+                    <ul className="text-left space-y-3 text-sm flex-1">
+                      <li className="flex items-start gap-3 text-[#042F34] font-bold">
+                        <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Tudo do Ingresso, mais:
+                      </li>
+                      <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
+                        <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> 2 encontros ao vivo de 1h com mentor
+                      </li>
+                      <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
+                        <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Aplicação direta no seu negócio
+                      </li>
+                      <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
+                        <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Revisão dos seus prompts e automações
+                      </li>
+                      <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
+                        <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Acesso direto via WhatsApp
+                      </li>
+                      <li className="flex items-start gap-3 text-[#042F34]/75 font-medium">
+                        <Check size={16} className="text-brand-accent shrink-0 mt-0.5" strokeWidth={3} /> Plano de implementação personalizado
+                      </li>
+                    </ul>
+
+                    {!MENTORIA_ESGOTADA && (
+                      <div className="mt-auto pt-8">
+                        <a href="https://pay.kiwify.com.br/ez6cNqF" target="_blank" rel="noopener noreferrer" className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white py-5 rounded-2xl text-lg font-bold transition-all shadow-xl shadow-brand-accent/30 flex items-center justify-center gap-2 active:scale-95">
+                          Quero Workshop + Mentoria <ArrowRight size={20} />
+                        </a>
+                        <p className="mt-3 text-[11px] text-[#042F34]/50 text-center">Pagamento seguro · Garantia de 7 dias · Vagas limitadas</p>
+                      </div>
                     )}
-                    <p className="mt-3 text-[11px] text-[#042F34]/50 text-center">Pagamento seguro · Garantia de 7 dias · Vagas limitadas</p>
                   </div>
+
+                  {/* Seção lista de espera — fora do grayscale, só aparece quando esgotado */}
+                  {MENTORIA_ESGOTADA && (
+                    <div className="px-8 pb-8 pt-5 border-t border-[#042F34]/15">
+                      <p className="text-[#042F34]/65 text-[13px] leading-snug mb-4 text-center">
+                        As vagas estão esgotadas — mas você pode entrar na lista de espera e entraremos em contato quando houver novas vagas.
+                      </p>
+                      <button
+                        onClick={() => setShowWaitlistModal(true)}
+                        className="w-full bg-[#042F34] text-white py-4 rounded-2xl font-bold text-base transition-all shadow-lg shadow-[#042F34]/20 hover:bg-[#042F34]/90 active:scale-95 flex items-center justify-center gap-2"
+                      >
+                        Entrar na lista de espera <ArrowRight size={18} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1188,6 +1231,114 @@ export default function App() {
           </div>
         </section>
       </main>
+
+      {/* Modal — Lista de Espera Mentoria */}
+      <AnimatePresence>
+        {showWaitlistModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            onClick={(e) => { if (e.target === e.currentTarget) closeWaitlistModal(); }}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+              className="relative w-full max-w-md bg-brand-tag rounded-3xl p-8 shadow-2xl"
+            >
+              <button
+                onClick={closeWaitlistModal}
+                className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#042F34]/10 hover:bg-[#042F34]/20 text-[#042F34] transition-colors"
+                aria-label="Fechar"
+              >
+                ✕
+              </button>
+
+              {waitlistStatus === 'success' ? (
+                <div className="text-center py-6">
+                  <div className="text-4xl mb-4">✅</div>
+                  <h3 className="text-xl font-bold text-[#042F34] mb-2">Você está na lista!</h3>
+                  <p className="text-[#042F34]/65 text-sm leading-relaxed mb-6">
+                    Recebemos sua candidatura. Entraremos em contato pelo e-mail ou celular informados quando abrirmos novas vagas de mentoria.
+                  </p>
+                  <button
+                    onClick={closeWaitlistModal}
+                    className="w-full bg-[#042F34] text-white py-3 rounded-2xl font-bold transition-all hover:bg-[#042F34]/90 active:scale-95"
+                  >
+                    Fechar
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-xl font-bold text-[#042F34] mb-1">Lista de espera — Mentoria</h3>
+                  <p className="text-[#042F34]/60 text-sm mb-6 leading-snug">
+                    Preencha seus dados abaixo. Quando abrirmos novas vagas, entraremos em contato com você.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[11px] font-black text-[#042F34] uppercase tracking-[0.15em] mb-1.5">Nome completo</label>
+                      <input
+                        type="text"
+                        value={waitlistForm.nome}
+                        onChange={(e) => setWaitlistForm(f => ({ ...f, nome: e.target.value }))}
+                        placeholder="Seu nome"
+                        className="w-full bg-white/70 border border-[#042F34]/15 rounded-xl px-4 py-3 text-[#042F34] placeholder-[#042F34]/35 text-sm focus:outline-none focus:border-[#042F34]/40 focus:bg-white transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-black text-[#042F34] uppercase tracking-[0.15em] mb-1.5">E-mail</label>
+                      <input
+                        type="email"
+                        value={waitlistForm.email}
+                        onChange={(e) => setWaitlistForm(f => ({ ...f, email: e.target.value }))}
+                        placeholder="seu@email.com"
+                        className="w-full bg-white/70 border border-[#042F34]/15 rounded-xl px-4 py-3 text-[#042F34] placeholder-[#042F34]/35 text-sm focus:outline-none focus:border-[#042F34]/40 focus:bg-white transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-black text-[#042F34] uppercase tracking-[0.15em] mb-1.5">Número de celular</label>
+                      <input
+                        type="tel"
+                        value={waitlistForm.celular}
+                        onChange={(e) => setWaitlistForm(f => ({ ...f, celular: e.target.value }))}
+                        placeholder="(11) 99999-9999"
+                        className="w-full bg-white/70 border border-[#042F34]/15 rounded-xl px-4 py-3 text-[#042F34] placeholder-[#042F34]/35 text-sm focus:outline-none focus:border-[#042F34]/40 focus:bg-white transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-black text-[#042F34] uppercase tracking-[0.15em] mb-1.5">Objetivo com a mentoria</label>
+                      <textarea
+                        value={waitlistForm.descricao}
+                        onChange={(e) => setWaitlistForm(f => ({ ...f, descricao: e.target.value }))}
+                        placeholder="Descreva brevemente o que você quer resolver ou construir com a ajuda da mentoria..."
+                        rows={3}
+                        className="w-full bg-white/70 border border-[#042F34]/15 rounded-xl px-4 py-3 text-[#042F34] placeholder-[#042F34]/35 text-sm focus:outline-none focus:border-[#042F34]/40 focus:bg-white transition-colors resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  {waitlistStatus === 'error' && (
+                    <p className="text-red-600 text-xs mt-3 text-center">Algo deu errado. Tente novamente.</p>
+                  )}
+
+                  <button
+                    onClick={submitWaitlist}
+                    disabled={waitlistStatus === 'submitting'}
+                    className="w-full mt-6 bg-[#042F34] text-white py-4 rounded-2xl font-bold text-base transition-all shadow-lg shadow-[#042F34]/20 hover:bg-[#042F34]/90 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {waitlistStatus === 'submitting' ? 'Enviando...' : <>Aplicar para a lista de espera <ArrowRight size={18} /></>}
+                  </button>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <footer className="py-12 bg-[#070D0D] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold tracking-[0.2em] uppercase text-white/50">
